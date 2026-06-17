@@ -3,1538 +3,1200 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>KUCAT-CBT 2026 | Kathmandu University Entrance Examination</title>
+  <title>KUCAT-CBT 2026 | Kathmandu University</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     window.MathJax = {
-      tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']]
-      },
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
       startup: { typeset: false }
     };
   </script>
   <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-    * { font-family: 'Inter', sans-serif; }
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    * { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
 
     :root {
-      --ku-navy: #0f2044;
-      --ku-blue: #1a3a6b;
-      --ku-gold: #c8a84b;
-      --ku-light: #f4f6f9;
+      --ku-navy: #1a2f5c;
+      --ku-navy-dark: #15264a;
+      --ku-navy-light: #243d75;
+      --ku-red: #c8102e;
+      --ku-gold: #d4a017;
+      --ku-bg: #f5f6f8;
     }
 
-    body { background-color: #eef0f5; }
-    .dark body { background-color: #0d1117; }
+    body { background: #f5f6f8; }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #c1c9d6; border-radius: 4px; }
-    .dark ::-webkit-scrollbar-thumb { background: #334155; }
-
-    /* Login card strip */
-    .ku-header-strip {
-      background: linear-gradient(135deg, #0f2044 0%, #1a3a6b 60%, #0f2044 100%);
-      border-bottom: 3px solid #c8a84b;
+    /* Chevron pattern (from KU site background) */
+    .chevron-bg {
+      background-color: #f5f6f8;
+      background-image:
+        linear-gradient(135deg, rgba(26,47,92,0.03) 25%, transparent 25%),
+        linear-gradient(225deg, rgba(26,47,92,0.03) 25%, transparent 25%);
+      background-size: 80px 80px;
+      background-position: 0 0, 40px 0;
     }
 
-    /* Option hover states */
-    .option-btn { transition: all 0.15s ease; }
-    .option-btn:hover:not(.selected):not(.disabled-opt) {
-      border-color: #94a3b8;
-      background-color: #f8fafc;
-    }
-    .dark .option-btn:hover:not(.selected):not(.disabled-opt) {
-      background-color: #1e293b;
-      border-color: #475569;
-    }
-    .option-btn.selected {
-      border-color: #1a3a6b;
-      background-color: #eff6ff;
-    }
-    .dark .option-btn.selected {
-      border-color: #3b82f6;
-      background-color: #1e3a5f;
+    /* Navy header gradient */
+    .ku-header {
+      background: linear-gradient(180deg, #1a2f5c 0%, #15264a 100%);
     }
 
-    /* Timer urgency */
-    .timer-urgent { animation: pulse-red 1s ease-in-out infinite; }
-    @keyframes pulse-red {
-      0%, 100% { background-color: #fef2f2; }
-      50% { background-color: #fee2e2; }
+    /* Hero gradient like KU homepage */
+    .ku-hero {
+      background: linear-gradient(135deg, #1a2f5c 0%, #243d75 50%, #1a2f5c 100%);
+      position: relative;
+      overflow: hidden;
     }
-
-    /* Section fade in */
-    .fade-in { animation: fadeIn 0.25s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-    /* Grid cell */
-    .q-cell { width: 28px; height: 28px; font-size: 9px; border-radius: 3px; display: flex; align-items: center; justify-content: center; font-weight: 700; transition: all 0.15s; }
-    .q-cell.answered { background: #16a34a; color: white; }
-    .q-cell.current { background: #1a3a6b; color: white; outline: 2px solid #93c5fd; outline-offset: 1px; }
-    .q-cell.unanswered { background: #e2e8f0; color: #94a3b8; }
-    .dark .q-cell.unanswered { background: #1e293b; color: #475569; }
-
-    /* Watermark */
-    .exam-watermark {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) rotate(-30deg);
-      font-size: 5rem;
-      font-weight: 900;
-      color: rgba(15, 32, 68, 0.025);
+    .ku-hero::before {
+      content: "";
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(135deg, rgba(255,255,255,0.03) 25%, transparent 25%),
+        linear-gradient(225deg, rgba(255,255,255,0.03) 25%, transparent 25%);
+      background-size: 100px 100px;
       pointer-events: none;
-      white-space: nowrap;
-      z-index: 0;
-      user-select: none;
     }
-    .dark .exam-watermark { color: rgba(255,255,255,0.02); }
 
-    /* Result pass/fail */
-    .result-pass { background: #dcfce7; color: #15803d; border: 1.5px solid #86efac; }
-    .result-fail { background: #fee2e2; color: #b91c1c; border: 1.5px solid #fca5a5; }
-    .dark .result-pass { background: #14532d; color: #4ade80; border-color: #166534; }
-    .dark .result-fail { background: #450a0a; color: #f87171; border-color: #7f1d1d; }
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c5cad4; border-radius: 3px; }
 
-    /* Instruction box */
-    .instruction-item::before {
-      content: counter(inst-counter);
-      counter-increment: inst-counter;
-      background: #1a3a6b;
-      color: white;
-      width: 18px;
-      height: 18px;
+    /* KU logo (circular crest) */
+    .ku-crest {
+      background: white;
+      border: 2px solid #d4a017;
       border-radius: 50%;
-      font-size: 10px;
-      font-weight: 700;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
-      margin-right: 8px;
+      color: #c8102e;
+      font-weight: 900;
+      font-family: serif;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-    .instruction-list { counter-reset: inst-counter; }
+
+    /* Option button states */
+    .opt-btn { transition: all 0.15s ease; }
+    .opt-btn:hover:not(.selected) {
+      border-color: #1a2f5c;
+      background: #f8fafc;
+    }
+    .opt-btn.selected {
+      border-color: #1a2f5c;
+      background: #eef2fa;
+      box-shadow: 0 0 0 1px #1a2f5c inset;
+    }
+    .opt-btn.selected .opt-letter {
+      background: #1a2f5c;
+      color: white;
+      border-color: #1a2f5c;
+    }
+
+    /* Fade animation */
+    .fade-in { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Question grid cells */
+    .q-cell {
+      width: 32px; height: 32px;
+      font-size: 11px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+    .q-cell.answered {
+      background: #1a2f5c;
+      color: white;
+    }
+    .q-cell.current {
+      background: #c8102e;
+      color: white;
+      outline: 2px solid #c8102e;
+      outline-offset: 2px;
+    }
+    .q-cell.pending {
+      background: #e8eaef;
+      color: #94a3b8;
+    }
+
+    /* Timer */
+    .timer-urgent { background: #fee2e2 !important; color: #b91c1c !important; border-color: #fca5a5 !important; }
+
+    /* Hero diagonal accent */
+    .hero-accent {
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 60%; height: 100%;
+      background: linear-gradient(135deg, transparent 50%, rgba(212,160,23,0.08) 50%);
+      pointer-events: none;
+    }
+
+    /* Card shadow */
+    .ku-card-shadow { box-shadow: 0 1px 3px rgba(26,47,92,0.06), 0 4px 16px rgba(26,47,92,0.04); }
+
+    /* Section heading underline */
+    .ku-heading::after {
+      content: "";
+      display: block;
+      width: 40px;
+      height: 3px;
+      background: #c8102e;
+      margin-top: 8px;
+    }
+
+    /* Number/results display */
+    .display-number {
+      font-family: 'Inter', sans-serif;
+      font-weight: 900;
+      font-feature-settings: 'tnum' 1;
+      letter-spacing: -0.02em;
+    }
+
+    /* Custom radio for stream */
+    .stream-card { transition: all 0.2s; cursor: pointer; }
+    .stream-card[data-selected="true"] {
+      border-color: #1a2f5c;
+      background: #eef2fa;
+    }
+    .stream-card[data-selected="true"] .stream-indicator {
+      background: #1a2f5c;
+      border-color: #1a2f5c;
+    }
+    .stream-card[data-selected="true"] .stream-indicator::after {
+      content: "";
+      width: 8px; height: 8px;
+      background: white;
+      border-radius: 50%;
+    }
   </style>
 </head>
 
-<body class="min-h-screen transition-colors duration-200 dark:bg-slate-950 dark:text-slate-100">
+<body class="text-slate-800">
 
-  <!-- Background watermark -->
-  <div class="exam-watermark select-none">KUCAT 2026</div>
+  <div id="app">
 
-  <div id="app" class="flex flex-col min-h-screen relative z-10">
+  <!-- ═══════════════════ TOP NAVY HEADER (KU Style) ═══════════════════ -->
+  <header class="ku-header text-white sticky top-0 z-50">
+    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12">
+      <div class="flex items-center justify-between h-20">
 
-    <!-- ═══════════════════ HEADER ═══════════════════ -->
-    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-50 shadow-sm">
-      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-
-        <!-- Branding -->
-        <div class="flex items-center gap-3 shrink-0">
-          <div class="w-9 h-9 rounded-full flex items-center justify-center text-white font-black text-sm shadow"
-               style="background: linear-gradient(135deg, #0f2044, #1a3a6b); border: 2px solid #c8a84b;">
-            KU
-          </div>
-          <div class="hidden sm:block leading-tight">
-            <div class="text-xs font-800 text-slate-800 dark:text-slate-100 font-bold tracking-tight">Kathmandu University</div>
-            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-wide uppercase">Common Admission Test — CBT Portal</div>
+        <!-- Logo + Title -->
+        <div class="flex items-center gap-4">
+          <div class="ku-crest w-12 h-12 text-base">KU</div>
+          <div class="leading-tight">
+            <div class="text-[10px] uppercase tracking-[0.18em] font-semibold text-blue-200/80">Kathmandu University</div>
+            <div class="text-base font-bold tracking-tight">Common Admission Test — CBT</div>
           </div>
         </div>
 
-        <!-- Exam Status Bar (hidden until exam starts) -->
-        <div id="exam-statusbar" class="hidden flex-1 flex items-center justify-center gap-6">
-          <div class="flex items-center gap-2 text-xs">
-            <span class="text-slate-400 font-medium">Candidate:</span>
-            <span id="hdr-username" class="font-semibold text-slate-700 dark:text-slate-200 font-mono text-[11px]">—</span>
+        <!-- Navigation links (decorative, like KU site) -->
+        <nav class="hidden lg:flex items-center gap-8 text-[13px] font-medium tracking-wide">
+          <span class="text-white/90 cursor-default">Home</span>
+          <span class="text-white/70 hover:text-white transition-colors cursor-default">About KU</span>
+          <span class="text-white/70 hover:text-white transition-colors cursor-default">KU Online</span>
+          <span class="text-white/70 hover:text-white transition-colors cursor-default">Admission</span>
+          <span class="text-white/70 hover:text-white transition-colors cursor-default">Academics</span>
+        </nav>
+
+        <!-- Right side: status during exam, else empty -->
+        <div class="flex items-center gap-4">
+          <div id="hdr-exam-status" class="hidden items-center gap-4">
+            <div class="hidden md:flex items-center gap-2 text-xs">
+              <span class="text-blue-200/70">Candidate</span>
+              <span id="hdr-username" class="font-semibold tracking-wide">—</span>
+            </div>
+            <div id="timer-box" class="hidden items-center gap-2 px-3 py-1.5 rounded border bg-white/10 border-white/20 font-mono text-sm font-bold tabular-nums">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+              </svg>
+              <span id="timer-display">120:00</span>
+            </div>
           </div>
-          <div class="h-4 w-px bg-slate-200 dark:bg-slate-700"></div>
-          <div id="hdr-stream-tag" class="text-[11px] font-bold px-2.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 tracking-wide uppercase"></div>
         </div>
 
-        <!-- Right side controls -->
-        <div class="flex items-center gap-3 shrink-0">
-          <!-- Timer -->
-          <div id="timer-box" class="hidden items-center gap-1.5 px-3 py-1.5 rounded border font-mono text-sm font-bold
-                                      bg-slate-50 border-slate-200 text-slate-700
-                                      dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
-            <svg class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
-            </svg>
-            <span id="timer-display" class="tabular-nums">120:00</span>
-          </div>
+      </div>
+    </div>
+  </header>
 
-          <!-- Dark mode -->
-          <button id="theme-toggle" aria-label="Toggle theme"
-                  class="w-8 h-8 flex items-center justify-center rounded border border-slate-200 dark:border-slate-700
-                         bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400
-                         hover:border-slate-300 dark:hover:border-slate-600 transition-colors">
-            <svg id="icon-sun" class="w-4 h-4 dark:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-              <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
-            </svg>
-            <svg id="icon-moon" class="w-4 h-4 hidden dark:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
-            </svg>
-          </button>
+
+  <!-- ═══════════════════ PHASE 1: LOGIN ═══════════════════ -->
+  <main id="phase-login" class="min-h-[calc(100vh-5rem-3rem)]">
+
+    <!-- Hero Banner (KU style) -->
+    <section class="ku-hero text-white py-20 lg:py-28 relative">
+      <div class="hero-accent"></div>
+      <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 relative z-10">
+        <div class="max-w-3xl">
+          <div class="text-[11px] uppercase tracking-[0.25em] font-semibold text-blue-200/80 mb-4">
+            Official Mock Examination Portal · 2026
+          </div>
+          <h1 class="text-4xl lg:text-6xl font-black tracking-tight leading-[1.05] mb-4">
+            COMMON ADMISSION<br>TEST (KUCAT-CBT)
+          </h1>
+          <div class="w-16 h-1 bg-yellow-500 mb-6"></div>
+          <p class="text-base lg:text-lg text-blue-100/90 font-light max-w-xl leading-relaxed">
+            Adaptive computer-based entrance examination conducted by Kathmandu University,
+            Dhulikhel for admission to undergraduate programmes.
+          </p>
         </div>
       </div>
-    </header>
+    </section>
 
+    <!-- Login + Instructions -->
+    <section class="max-w-screen-2xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
+      <div class="grid lg:grid-cols-5 gap-8 lg:gap-12">
 
-    <!-- ═══════════════════ PHASE 1: LOGIN ═══════════════════ -->
-    <main id="phase-login" class="flex-grow flex items-center justify-center p-4 py-10">
-      <div class="w-full max-w-md fade-in">
+        <!-- LEFT: Instructions -->
+        <div class="lg:col-span-3 fade-in">
+          <div class="text-[11px] uppercase tracking-[0.2em] font-bold text-red-700 mb-2">Read Before You Begin</div>
+          <h2 class="ku-heading text-2xl lg:text-3xl font-black text-slate-900 tracking-tight mb-8">
+            Examination Instructions
+          </h2>
 
-        <!-- KU Header Card -->
-        <div class="ku-header-strip rounded-t-xl px-6 py-7 text-center text-white">
-          <div class="flex justify-center mb-4">
-            <div class="w-14 h-14 rounded-full flex items-center justify-center text-white font-black text-xl shadow-lg"
-                 style="background: rgba(255,255,255,0.12); border: 2px solid #c8a84b;">
-              KU
+          <div class="space-y-5">
+
+            <div class="flex gap-4">
+              <div class="shrink-0 w-8 h-8 bg-slate-900 text-white rounded-sm flex items-center justify-center text-xs font-black">01</div>
+              <div>
+                <h3 class="font-bold text-slate-900 text-sm mb-1">Duration & Structure</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                  Total duration of <strong>120 minutes</strong> for <strong>120 multiple-choice questions</strong>,
+                  distributed equally across three subjects (40 questions per section).
+                </p>
+              </div>
             </div>
+
+            <div class="flex gap-4">
+              <div class="shrink-0 w-8 h-8 bg-slate-900 text-white rounded-sm flex items-center justify-center text-xs font-black">02</div>
+              <div>
+                <h3 class="font-bold text-slate-900 text-sm mb-1">Linear Progression</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                  Questions are presented sequentially and <strong>cannot be revisited</strong>.
+                  Once submitted, a response is final and cannot be changed.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="shrink-0 w-8 h-8 bg-slate-900 text-white rounded-sm flex items-center justify-center text-xs font-black">03</div>
+              <div>
+                <h3 class="font-bold text-slate-900 text-sm mb-1">Adaptive Scoring</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                  The system adjusts question difficulty (Tier 1 to Tier 5) based on your performance.
+                  Each correct answer awards <strong>11 to 19 points</strong> proportional to difficulty.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="shrink-0 w-8 h-8 bg-slate-900 text-white rounded-sm flex items-center justify-center text-xs font-black">04</div>
+              <div>
+                <h3 class="font-bold text-slate-900 text-sm mb-1">No Negative Marking</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                  Incorrect responses receive zero marks. However, they lower the
+                  difficulty tier and limit your maximum achievable score.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex gap-4">
+              <div class="shrink-0 w-8 h-8 bg-red-700 text-white rounded-sm flex items-center justify-center text-xs font-black">!</div>
+              <div>
+                <h3 class="font-bold text-red-700 text-sm mb-1">Important</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                  Do not refresh, close, or navigate away from this window during the examination.
+                  Doing so will result in automatic submission of your current responses.
+                </p>
+              </div>
+            </div>
+
           </div>
-          <h1 class="text-lg font-bold tracking-tight">Kathmandu University</h1>
-          <p class="text-sm text-blue-200 mt-0.5">Common Admission Test (KUCAT) — 2026</p>
-          <div class="mt-3 inline-block px-3 py-1 rounded text-[11px] font-bold tracking-widest uppercase"
-               style="background: rgba(200,168,75,0.2); border: 1px solid rgba(200,168,75,0.5); color: #e8c96a;">
-            Computer Based Test (CBT) — Mock Portal
+
+          <!-- Pass mark indicator -->
+          <div class="mt-10 p-5 border-l-4 border-yellow-600 bg-yellow-50">
+            <div class="text-[10px] uppercase tracking-wider font-bold text-yellow-800 mb-1">Qualifying Score</div>
+            <div class="text-2xl font-black text-slate-900 display-number">528 / 2280 <span class="text-sm font-medium text-slate-500">points</span></div>
           </div>
         </div>
 
-        <!-- Login Form Card -->
-        <div class="bg-white dark:bg-slate-900 rounded-b-xl border border-t-0 border-slate-200 dark:border-slate-800 shadow-lg">
+        <!-- RIGHT: Login form -->
+        <div class="lg:col-span-2 fade-in">
+          <div class="bg-white border border-slate-200 ku-card-shadow">
 
-          <!-- Instructions Banner -->
-          <div class="px-6 py-4 bg-amber-50 dark:bg-amber-950/20 border-b border-amber-100 dark:border-amber-900/30">
-            <div class="flex gap-2.5">
-              <svg class="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-              </svg>
-              <div class="text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed space-y-0.5">
-                <p class="font-bold mb-1">Before you begin — read carefully:</p>
-                <div class="instruction-list space-y-1">
-                  <div class="instruction-item flex items-center">Total duration: <strong class="ml-1">120 minutes</strong>, 120 questions (40 per subject).</div>
-                  <div class="instruction-item flex items-center"><strong class="mr-1">No backtracking.</strong> Each question must be answered before proceeding.</div>
-                  <div class="instruction-item flex items-center">Adaptive scoring: Correct answers increase question difficulty and points.</div>
-                  <div class="instruction-item flex items-center"><strong class="mr-1">No negative marking.</strong> Incorrect responses score zero.</div>
-                </div>
-              </div>
+            <!-- Form header -->
+            <div class="px-7 py-5 border-b border-slate-100 bg-slate-50">
+              <div class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mb-1">Candidate Login</div>
+              <div class="text-base font-bold text-slate-900">Authenticate to Continue</div>
             </div>
-          </div>
 
-          <!-- Form Fields -->
-          <form id="login-form" class="px-6 py-6 space-y-5">
+            <form id="login-form" class="px-7 py-6 space-y-5">
 
-            <div class="space-y-4">
               <div>
-                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5" for="input-symbol">
-                  Exam Symbol No. / Registered Email
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2" for="input-symbol">
+                  Symbol No. / Email
                 </label>
-                <input type="text" id="input-symbol"
-                       class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700
-                              bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100
-                              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                              placeholder:text-slate-400 font-mono transition"
-                       placeholder="e.g. KUCAT-2026-001234" value="KUCAT-2026-001234" required>
+                <input type="text" id="input-symbol" required
+                  value="KUCAT-2026-001234"
+                  class="w-full px-4 py-3 text-sm border border-slate-300 rounded-none
+                         focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900
+                         transition placeholder:text-slate-400 font-mono">
               </div>
 
               <div>
-                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5" for="input-password">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2" for="input-password">
                   Access Password
                 </label>
-                <input type="password" id="input-password"
-                       class="w-full px-3.5 py-2.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700
-                              bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100
-                              focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                              placeholder:text-slate-400 transition"
-                       placeholder="Enter your password" value="demo123" required>
+                <input type="password" id="input-password" required value="demo123"
+                  class="w-full px-4 py-3 text-sm border border-slate-300 rounded-none
+                         focus:outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900
+                         transition placeholder:text-slate-400">
               </div>
-            </div>
 
-            <!-- Stream Selection -->
-            <div>
-              <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
-                Select Examination Stream
-              </label>
-              <div class="grid grid-cols-2 gap-3">
-
-                <label id="lbl-pcm" class="stream-option relative flex flex-col gap-1 p-3.5 rounded-lg border-2 cursor-pointer transition-all
-                                            border-blue-700 bg-blue-50 dark:bg-blue-950/30">
-                  <input type="radio" name="stream" value="pcm" class="sr-only" checked>
-                  <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-black uppercase tracking-wider text-blue-800 dark:text-blue-300">Engineering</span>
-                    <div class="w-4 h-4 rounded-full border-2 border-blue-600 flex items-center justify-center" id="ring-pcm">
-                      <div class="w-2 h-2 rounded-full bg-blue-600"></div>
-                    </div>
-                  </div>
-                  <span class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">Physics · Chemistry · Math</span>
-                  <span class="text-[10px] text-slate-500">B.E. / B.Arch Programs</span>
+              <div>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">
+                  Examination Stream
                 </label>
-
-                <label id="lbl-pcb" class="stream-option relative flex flex-col gap-1 p-3.5 rounded-lg border-2 cursor-pointer transition-all
-                                            border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50">
-                  <input type="radio" name="stream" value="pcb" class="sr-only">
-                  <div class="flex items-center justify-between">
-                    <span class="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">BioTech / Sci</span>
-                    <div class="w-4 h-4 rounded-full border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center" id="ring-pcb">
-                      <!-- dot added via JS -->
+                <div class="space-y-2">
+                  <div class="stream-card border-2 border-slate-200 p-4 flex items-center gap-3" data-stream="pcm" data-selected="true">
+                    <div class="stream-indicator w-5 h-5 border-2 border-slate-300 rounded-full flex items-center justify-center shrink-0"></div>
+                    <div class="flex-1">
+                      <div class="text-sm font-bold text-slate-900">Engineering Stream</div>
+                      <div class="text-[11px] text-slate-500 mt-0.5">Physics · Chemistry · Mathematics</div>
                     </div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">PCM</span>
                   </div>
-                  <span class="text-[11px] font-semibold text-slate-700 dark:text-slate-300">Physics · Chemistry · Biology</span>
-                  <span class="text-[10px] text-slate-500">B.Sc. / BPH Programs</span>
-                </label>
-
+                  <div class="stream-card border-2 border-slate-200 p-4 flex items-center gap-3" data-stream="pcb" data-selected="false">
+                    <div class="stream-indicator w-5 h-5 border-2 border-slate-300 rounded-full flex items-center justify-center shrink-0"></div>
+                    <div class="flex-1">
+                      <div class="text-sm font-bold text-slate-900">Biological Science Stream</div>
+                      <div class="text-[11px] text-slate-500 mt-0.5">Physics · Chemistry · Biology</div>
+                    </div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">PCB</span>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <!-- Submit -->
-            <button type="submit"
-                    class="w-full py-3 rounded-lg text-sm font-bold text-white tracking-wide transition-all active:scale-[0.98] shadow-md hover:shadow-lg"
-                    style="background: linear-gradient(135deg, #0f2044, #1a3a6b);">
-              Proceed to Examination →
-            </button>
+              <button type="submit"
+                class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm py-3.5 tracking-wide uppercase
+                       transition-colors flex items-center justify-center gap-3 group">
+                <span>Proceed to Examination</span>
+                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path d="M5 12h14M13 5l7 7-7 7"/>
+                </svg>
+              </button>
 
-            <p class="text-center text-[10px] text-slate-400">
-              By proceeding, you acknowledge that all responses are final and binding.
-            </p>
-          </form>
+              <p class="text-[10px] text-slate-400 text-center pt-2">
+                By proceeding, you acknowledge that all responses will be final.
+              </p>
+            </form>
+          </div>
+
+          <!-- Help text below form -->
+          <div class="mt-4 text-[11px] text-slate-500 px-2">
+            <strong class="text-slate-700">Need help?</strong> Contact the Office of Admissions at <span class="text-slate-900 underline cursor-default">admission@ku.edu.np</span> or call <span class="font-mono text-slate-900">+977-11-415100</span>
+          </div>
         </div>
 
-        <!-- Footer note -->
-        <p class="text-center text-[10px] text-slate-400 mt-4">
-          KUCAT-CBT Adaptive Engine v2.6 &nbsp;·&nbsp; For support, contact: exam-helpdesk@ku.edu.np
-        </p>
       </div>
-    </main>
+    </section>
+  </main>
 
 
-    <!-- ═══════════════════ PHASE 2: EXAM INTERFACE ═══════════════════ -->
-    <main id="phase-exam" class="hidden flex-grow flex flex-col">
+  <!-- ═══════════════════ PHASE 2: EXAM INTERFACE ═══════════════════ -->
+  <main id="phase-exam" class="hidden chevron-bg min-h-[calc(100vh-5rem-3rem)]">
 
-      <!-- Subject Navigation Bar -->
-      <div class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm">
-        <div class="max-w-screen-xl mx-auto px-4 sm:px-6 h-11 flex items-center justify-between gap-4">
-          <div id="subject-tabs" class="flex items-center gap-0.5 h-full"></div>
-          <div class="flex items-center gap-3 text-[11px]">
-            <span class="text-slate-400 hidden sm:inline">Overall Progress:</span>
-            <span id="overall-count" class="font-bold font-mono text-slate-700 dark:text-slate-300">0 / 120</span>
-            <div class="w-28 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-              <div id="overall-bar" class="h-full rounded-full transition-all duration-300" style="background:#1a3a6b; width:0%"></div>
-            </div>
+    <!-- Exam Sub-Header (subject tabs + progress) -->
+    <div class="bg-white border-b border-slate-200">
+      <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 flex items-center justify-between">
+        <div id="subject-tabs" class="flex"></div>
+        <div class="flex items-center gap-4 text-[11px]">
+          <span class="text-slate-500 hidden sm:inline uppercase tracking-wider font-semibold">Overall</span>
+          <span id="overall-count" class="font-black font-mono text-slate-900">0 / 120</span>
+          <div class="w-32 h-1.5 bg-slate-200 overflow-hidden">
+            <div id="overall-bar" class="h-full transition-all duration-300" style="background:#1a2f5c; width:0%"></div>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Main Exam Layout -->
-      <div class="flex-grow flex overflow-hidden max-w-screen-xl mx-auto w-full px-4 sm:px-6 py-5 gap-5">
+    <!-- Main Exam Layout -->
+    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 py-8">
+      <div class="grid lg:grid-cols-[1fr_320px] gap-8">
 
-        <!-- ── Left: Question Panel ── -->
-        <div class="flex-grow flex flex-col min-w-0 gap-4">
+        <!-- LEFT: Question -->
+        <div class="space-y-4 fade-in">
+          <div class="bg-white border border-slate-200 ku-card-shadow">
 
-          <!-- Question Card -->
-          <div class="flex-grow flex flex-col bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden fade-in">
-
-            <!-- Card Header -->
-            <div class="flex items-center justify-between px-5 py-3 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60">
+            <!-- Question Header -->
+            <div class="flex items-center justify-between px-7 py-4 border-b border-slate-100 bg-slate-50">
               <div class="flex items-center gap-3">
-                <span id="q-subject-label" class="text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">PHYSICS</span>
-                <span class="text-slate-200 dark:text-slate-700">|</span>
-                <span id="q-index-label" class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Question 1 of 40</span>
+                <span id="q-subject-label" class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">PHYSICS</span>
+                <span class="w-px h-4 bg-slate-300"></span>
+                <span id="q-index-label" class="text-[12px] text-slate-500 font-medium">Question 1 of 40</span>
               </div>
-              <div id="difficulty-pill" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all"></div>
+              <div id="difficulty-pill" class="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold tracking-wide uppercase border"></div>
             </div>
 
             <!-- Question Body -->
-            <div class="flex-grow px-6 py-7 overflow-y-auto">
-              <div id="question-text" class="text-sm sm:text-base font-medium leading-relaxed text-slate-800 dark:text-slate-100 mb-7 overflow-x-auto"></div>
-
-              <div id="options-container" class="space-y-2.5"></div>
+            <div class="px-7 py-8">
+              <div id="question-text" class="text-base lg:text-lg font-medium leading-relaxed text-slate-900 mb-8 overflow-x-auto"></div>
+              <div id="options-container" class="space-y-3"></div>
             </div>
 
-            <!-- Card Footer -->
-            <div class="flex items-center justify-between px-5 py-3.5 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60">
-              <div class="flex items-center gap-1.5 text-[11px] text-slate-400">
+            <!-- Footer -->
+            <div class="flex items-center justify-between px-7 py-4 border-t border-slate-100 bg-slate-50">
+              <div class="flex items-center gap-2 text-[11px] text-slate-500">
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/>
                 </svg>
-                <span>Select an option to enable submission. Answers are final.</span>
+                <span>Once submitted, your answer cannot be changed.</span>
               </div>
               <button id="btn-submit-next" disabled
-                      class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all
-                             disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.97] shadow-sm hover:shadow-md"
-                      style="background: linear-gradient(135deg, #0f2044, #1a3a6b);">
-                Submit & Continue
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                class="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold tracking-wider uppercase
+                       transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed flex items-center gap-2">
+                Submit & Next
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                   <path d="M9 18l6-6-6-6"/>
                 </svg>
               </button>
             </div>
           </div>
-
         </div>
 
-        <!-- ── Right: Sidebar ── -->
-        <div class="w-64 shrink-0 flex flex-col gap-4 hidden lg:flex">
+        <!-- RIGHT: Sidebar -->
+        <aside class="space-y-4 hidden lg:block">
 
-          <!-- Candidate Info -->
-          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-4">
-            <div class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-3">Candidate Info</div>
-            <div class="flex items-center gap-2.5">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-black shrink-0"
-                   style="background: linear-gradient(135deg, #0f2044, #1a3a6b);" id="sidebar-avatar">A</div>
+          <!-- Candidate info -->
+          <div class="bg-white border border-slate-200 ku-card-shadow p-5">
+            <div class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-3">Candidate</div>
+            <div class="flex items-center gap-3">
+              <div id="sidebar-avatar" class="w-10 h-10 bg-slate-900 text-white flex items-center justify-center text-sm font-black">A</div>
               <div>
-                <div id="sidebar-name" class="text-xs font-bold text-slate-800 dark:text-slate-100 font-mono truncate">—</div>
-                <div class="text-[10px] text-slate-400 mt-0.5">Session Active</div>
+                <div id="sidebar-name" class="text-xs font-bold font-mono text-slate-900 truncate">—</div>
+                <div id="sidebar-stream" class="text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider">—</div>
               </div>
             </div>
           </div>
 
-          <!-- Question Grid -->
-          <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 flex flex-col gap-3 flex-grow">
-            <div class="flex items-center justify-between">
-              <div class="text-[10px] font-black uppercase tracking-widest text-slate-400">Question Grid</div>
-              <span id="grid-subject-label" class="text-[10px] font-bold text-slate-500 dark:text-slate-400"></span>
+          <!-- Question grid -->
+          <div class="bg-white border border-slate-200 ku-card-shadow p-5">
+            <div class="flex items-center justify-between mb-4">
+              <div class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Question Map</div>
+              <span id="grid-subject-label" class="text-[10px] font-bold text-slate-700 uppercase tracking-wider"></span>
             </div>
 
-            <div id="question-grid" class="flex flex-wrap gap-1.5"></div>
+            <div id="question-grid" class="grid grid-cols-8 gap-1.5"></div>
 
-            <div class="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap gap-3 text-[10px] text-slate-500 font-semibold">
-              <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-green-600 inline-block"></span> Answered</span>
-              <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm inline-block" style="background:#1a3a6b;"></span> Current</span>
-              <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-slate-200 dark:bg-slate-700 inline-block"></span> Remaining</span>
+            <div class="mt-5 pt-4 border-t border-slate-100 space-y-1.5">
+              <div class="flex items-center gap-2 text-[10px] text-slate-600">
+                <span class="w-3 h-3 inline-block" style="background:#1a2f5c"></span>
+                <span class="font-semibold">Answered</span>
+              </div>
+              <div class="flex items-center gap-2 text-[10px] text-slate-600">
+                <span class="w-3 h-3 inline-block" style="background:#c8102e"></span>
+                <span class="font-semibold">Current Question</span>
+              </div>
+              <div class="flex items-center gap-2 text-[10px] text-slate-600">
+                <span class="w-3 h-3 inline-block bg-slate-200"></span>
+                <span class="font-semibold">Not Yet Reached</span>
+              </div>
             </div>
           </div>
 
-          <!-- End Exam -->
+          <!-- End exam -->
           <button id="btn-end-exam"
-                  class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-wide
-                         text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40
-                         bg-white dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950/20 transition-colors">
+            class="w-full py-3 border-2 border-red-700 text-red-700 hover:bg-red-700 hover:text-white
+                   text-[11px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
               <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
             </svg>
-            End & Submit Examination
+            End Examination
           </button>
 
+        </aside>
+      </div>
+    </div>
+  </main>
+
+
+  <!-- ═══════════════════ PHASE 3: RESULTS ═══════════════════ -->
+  <main id="phase-results" class="hidden chevron-bg min-h-[calc(100vh-5rem-3rem)]">
+
+    <!-- Results Hero -->
+    <section class="ku-hero text-white py-16 relative">
+      <div class="hero-accent"></div>
+      <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 relative z-10">
+        <div class="text-[11px] uppercase tracking-[0.25em] font-semibold text-blue-200/80 mb-3">
+          Official Result Statement
+        </div>
+        <h1 class="text-3xl lg:text-5xl font-black tracking-tight leading-tight">
+          Examination Performance Report
+        </h1>
+        <div class="w-16 h-1 bg-yellow-500 mt-4 mb-6"></div>
+        <p class="text-sm text-blue-100/80">
+          Generated on <span id="res-date" class="font-mono"></span> · Candidate: <span id="res-username" class="font-mono font-semibold">—</span>
+        </p>
+      </div>
+    </section>
+
+    <section class="max-w-screen-2xl mx-auto px-6 lg:px-12 py-10 space-y-6 fade-in">
+
+      <!-- Score Summary Card -->
+      <div class="bg-white border border-slate-200 ku-card-shadow">
+        <div class="grid lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
+
+          <!-- Total Score (featured) -->
+          <div class="lg:col-span-2 p-8 bg-slate-50">
+            <div class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mb-2">Total Score Achieved</div>
+            <div class="flex items-baseline gap-3 mb-3">
+              <span id="res-total-score" class="display-number text-7xl text-slate-900">0</span>
+              <span class="text-base text-slate-400 font-medium">/ 2280 points</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span id="res-pass-badge" class="inline-block px-4 py-1.5 text-[11px] font-black uppercase tracking-widest">—</span>
+              <span class="text-[11px] text-slate-500">Cutoff: <strong class="text-slate-900">528</strong></span>
+            </div>
+          </div>
+
+          <!-- Correct/Attempted -->
+          <div class="p-6">
+            <div class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mb-2">Correct / Attempted</div>
+            <div class="display-number text-3xl text-slate-900 mb-1" id="res-correct">0/0</div>
+            <div class="text-[11px] text-slate-500" id="res-accuracy">Accuracy: —</div>
+          </div>
+
+          <!-- Peak Tier + Time -->
+          <div class="p-6 space-y-4">
+            <div>
+              <div class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mb-1">Peak Tier</div>
+              <div class="display-number text-xl text-slate-900" id="res-peak">—</div>
+            </div>
+            <div class="pt-3 border-t border-slate-100">
+              <div class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mb-1">Time Used</div>
+              <div class="display-number text-xl text-slate-900 font-mono" id="res-time">00:00</div>
+            </div>
+          </div>
+
         </div>
       </div>
-    </main>
 
-
-    <!-- ═══════════════════ PHASE 3: RESULTS ═══════════════════ -->
-    <main id="phase-results" class="hidden flex-grow py-8 px-4">
-      <div class="max-w-4xl mx-auto space-y-5 fade-in">
-
-        <!-- Result Header -->
-        <div class="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md">
-
-          <!-- Dark Banner -->
-          <div class="px-8 py-8 text-white text-center relative" style="background: linear-gradient(135deg, #0f2044 0%, #162d55 100%); border-bottom: 2px solid #c8a84b;">
-            <div class="text-[10px] font-black uppercase tracking-[0.2em] mb-2" style="color: #c8a84b;">
-              Official Examination Result Statement
-            </div>
-            <h2 class="text-2xl font-extrabold tracking-tight">KUCAT Mock CBT — Performance Report</h2>
-            <p class="text-blue-200 text-xs mt-1">Kathmandu University Common Admission Test · 2026</p>
-
-            <!-- Score Block -->
-            <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-8">
-              <div class="text-center">
-                <div class="text-[10px] uppercase tracking-widest text-blue-300 mb-1">Total Score</div>
-                <div class="text-5xl font-black tabular-nums" id="res-total-score">0</div>
-                <div class="text-[11px] text-blue-300 mt-1">out of 2280 points</div>
-              </div>
-              <div class="h-16 w-px bg-blue-800 hidden sm:block"></div>
-              <div class="text-center space-y-2">
-                <div>
-                  <div class="text-[10px] text-blue-300 uppercase tracking-wide">Cutoff Benchmark</div>
-                  <div class="text-lg font-bold text-white">528 Points</div>
-                </div>
-                <div id="res-pass-badge" class="inline-block px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border">—</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Stat Row -->
-          <div class="grid grid-cols-3 divide-x divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
-
-            <div class="px-6 py-5 text-center">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Correct / Attempted</div>
-              <div class="text-2xl font-black text-slate-800 dark:text-slate-100" id="res-correct">0/0</div>
-              <div class="text-[11px] text-slate-500 mt-0.5" id="res-accuracy">Accuracy: —</div>
-            </div>
-
-            <div class="px-6 py-5 text-center">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Highest Adaptive Tier</div>
-              <div class="text-2xl font-black text-slate-800 dark:text-slate-100" id="res-peak">—</div>
-              <div class="text-[11px] text-slate-500 mt-0.5">Difficulty Level Reached</div>
-            </div>
-
-            <div class="px-6 py-5 text-center">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Time Taken</div>
-              <div class="text-2xl font-black font-mono text-slate-800 dark:text-slate-100" id="res-time">00:00</div>
-              <div class="text-[11px] text-slate-500 mt-0.5">of 120:00 allocated</div>
-            </div>
-          </div>
+      <!-- Subject breakdown -->
+      <div class="bg-white border border-slate-200 ku-card-shadow">
+        <div class="px-7 py-4 border-b border-slate-100 bg-slate-50">
+          <div class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">Subject Performance</div>
         </div>
-
-        <!-- Subject Breakdown -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-          <div class="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60">
-            <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">Subject-wise Performance Breakdown</h3>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-                <tr class="border-b border-slate-100 dark:border-slate-800">
-                  <th class="px-5 py-3 text-left text-[10px] font-black uppercase tracking-wider text-slate-400">Subject</th>
-                  <th class="px-5 py-3 text-center text-[10px] font-black uppercase tracking-wider text-slate-400">Attempted</th>
-                  <th class="px-5 py-3 text-center text-[10px] font-black uppercase tracking-wider text-slate-400">Correct</th>
-                  <th class="px-5 py-3 text-center text-[10px] font-black uppercase tracking-wider text-slate-400">Accuracy</th>
-                  <th class="px-5 py-3 text-right text-[10px] font-black uppercase tracking-wider text-slate-400">Score</th>
-                </tr>
-              </thead>
-              <tbody id="res-subject-rows" class="divide-y divide-slate-50 dark:divide-slate-800"></tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Adaptive Tier Distribution -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
-          <div class="mb-1">
-            <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">Adaptive Difficulty Distribution</h3>
-            <p class="text-[11px] text-slate-400 mt-1">Shows the proportion of questions served at each difficulty tier and your accuracy within each tier.</p>
-          </div>
-          <div class="grid grid-cols-5 gap-3 mt-4" id="res-tier-distribution"></div>
-        </div>
-
-        <!-- Detailed Review -->
-        <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-          <div class="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 flex items-center justify-between">
-            <h3 class="text-xs font-black uppercase tracking-widest text-slate-500">Detailed Question Review & Solutions</h3>
-            <span class="text-[10px] px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-bold">All Subjects</span>
-          </div>
-          <div id="res-review" class="divide-y divide-slate-50 dark:divide-slate-800 max-h-[600px] overflow-y-auto p-5 space-y-5"></div>
-        </div>
-
-        <!-- Restart -->
-        <div class="flex justify-center pt-2 pb-6">
-          <button onclick="location.reload()"
-                  class="px-8 py-3 rounded-lg text-sm font-bold text-white shadow-md hover:shadow-lg transition-all active:scale-[0.97]"
-                  style="background: linear-gradient(135deg, #0f2044, #1a3a6b);">
-            ← Return to Portal & Restart
-          </button>
-        </div>
-
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-100">
+              <th class="text-left px-7 py-3 text-[10px] uppercase tracking-wider text-slate-400 font-bold">Subject</th>
+              <th class="text-center px-7 py-3 text-[10px] uppercase tracking-wider text-slate-400 font-bold">Attempted</th>
+              <th class="text-center px-7 py-3 text-[10px] uppercase tracking-wider text-slate-400 font-bold">Correct</th>
+              <th class="text-center px-7 py-3 text-[10px] uppercase tracking-wider text-slate-400 font-bold">Accuracy</th>
+              <th class="text-right px-7 py-3 text-[10px] uppercase tracking-wider text-slate-400 font-bold">Score</th>
+            </tr>
+          </thead>
+          <tbody id="res-subject-rows" class="divide-y divide-slate-50"></tbody>
+        </table>
       </div>
-    </main>
 
-
-    <!-- ═══════════════════ FOOTER ═══════════════════ -->
-    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-3">
-      <div class="max-w-screen-xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-1 text-[10px] text-slate-400">
-        <span>© 2026 Kathmandu University — Office of the Controller of Examinations. All rights reserved.</span>
-        <span class="font-mono">CBT Adaptive Engine v2.6 · Secure Session</span>
+      <!-- Tier distribution -->
+      <div class="bg-white border border-slate-200 ku-card-shadow p-7">
+        <div class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500 mb-1">Adaptive Tier Distribution</div>
+        <p class="text-[11px] text-slate-400 mb-5">Number of questions served and accuracy at each difficulty tier.</p>
+        <div id="res-tier-distribution" class="grid grid-cols-2 md:grid-cols-5 gap-4"></div>
       </div>
-    </footer>
 
-  </div><!-- /app -->
+      <!-- Detailed review -->
+      <div class="bg-white border border-slate-200 ku-card-shadow">
+        <div class="px-7 py-4 border-b border-slate-100 bg-slate-50">
+          <div class="text-[10px] uppercase tracking-[0.2em] font-bold text-slate-500">Detailed Review & Solutions</div>
+        </div>
+        <div id="res-review" class="max-h-[640px] overflow-y-auto p-7 space-y-6"></div>
+      </div>
+
+      <!-- Restart -->
+      <div class="flex justify-center py-4">
+        <button onclick="location.reload()"
+          class="px-10 py-3.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold tracking-wider uppercase transition-colors">
+          Restart Examination
+        </button>
+      </div>
+
+    </section>
+  </main>
 
 
-  <!-- ═══════════════════ SCRIPTS ═══════════════════ -->
-  <script>
-  // ─────────────────────────────────────────────────────────────────────────────
-  // QUESTION ENGINE
-  // ─────────────────────────────────────────────────────────────────────────────
-  const QE = {
-    bank: {
-      physics: {
-        1: [
-          {
-            text: "A body of mass {m} kg is acted upon by a net force of {f} N. What is the acceleration of the body?",
-            gen() {
-              const m = rnd(2, 10), a = rnd(3, 12), f = m * a;
-              return {
-                vars: { m, f },
-                choices: [a, a + 3, Math.max(1, a - 3), a * 2],
-                correct: a,
-                unit: " m/s²",
-                exp: `By Newton's Second Law: $F = ma \\implies a = \\dfrac{F}{m} = \\dfrac{${f}}{${m}} = ${a} \\text{ m/s}^2$`
-              };
-            }
-          },
-          {
-            text: "A constant force of {f} N displaces an object by {d} m along the direction of the force. Calculate the work done.",
-            gen() {
-              const f = rnd(10, 50), d = rnd(2, 10), w = f * d;
-              return {
-                vars: { f, d },
-                choices: [w, w + 20, Math.max(0, w - 20), f + d],
-                correct: w,
-                unit: " J",
-                exp: `Work done: $W = F \\cdot d = ${f} \\times ${d} = ${w} \\text{ J}$`
-              };
-            }
-          }
-        ],
-        2: [
-          {
-            text: "An electron is accelerated through a potential difference of {v} V. What kinetic energy does it acquire (in eV)?",
-            gen() {
-              const v = rnd(2, 20) * 50;
-              return {
-                vars: { v },
-                choices: [v, v * 2, v / 2, v * 1.6],
-                correct: v,
-                unit: " eV",
-                exp: `For a charge $q = e$ accelerated through $V$ volts: $K.E. = eV = ${v} \\text{ eV}$`
-              };
-            }
-          },
-          {
-            text: "A wave travels with velocity {v} m/s and has a wavelength of {w} m. Determine its frequency.",
-            gen() {
-              const f = rnd(1, 10) * 50, w = rnd(2, 5), v = f * w;
-              return {
-                vars: { v, w },
-                choices: [f, f * 2, Math.max(10, f - 30), f / 2],
-                correct: f,
-                unit: " Hz",
-                exp: `Using $v = f\\lambda \\implies f = \\dfrac{v}{\\lambda} = \\dfrac{${v}}{${w}} = ${f} \\text{ Hz}$`
-              };
-            }
-          }
-        ],
-        3: [
-          {
-            text: "In a series LCR circuit, $V_R = 15$ V, $V_L = {vl}$ V, and $V_C = {vc}$ V. Find the resultant supply voltage.",
-            gen() {
-              const vl = rnd(3, 8) * 10, vc = vl - 20, ans = 25;
-              return {
-                vars: { vl, vc },
-                choices: [25, 35, 75, vl + vc + 15],
-                correct: 25,
-                unit: " V",
-                exp: `$V = \\sqrt{V_R^2 + (V_L - V_C)^2} = \\sqrt{15^2 + (${vl} - ${vc})^2} = \\sqrt{225 + 400} = \\sqrt{625} = 25\\text{ V}$`
-              };
-            }
-          },
-          {
-            text: "Two capacitors of {c1} μF and {c2} μF are connected in series. Calculate the equivalent capacitance.",
-            gen() {
-              const c2 = rnd(4, 8), c1 = c2 * 2;
-              const ans = parseFloat(((c1 * c2) / (c1 + c2)).toFixed(2));
-              return {
-                vars: { c1, c2 },
-                choices: [ans, c1 + c2, Math.abs(c1 - c2), parseFloat((ans * 1.5).toFixed(2))],
-                correct: ans,
-                unit: " μF",
-                exp: `Series capacitance: $C_{eq} = \\dfrac{C_1 C_2}{C_1 + C_2} = \\dfrac{${c1} \\times ${c2}}{${c1} + ${c2}} = ${ans}\\text{ μF}$`
-              };
-            }
-          }
-        ],
-        4: [
-          {
-            text: "What is the maximum wavelength (in terms of the Rydberg constant $R$) for the Paschen series ($n_1 = 3$, $n_2 = 4$) of hydrogen?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["144/(7R)", "36/(5R)", "100/(21R)", "9/R"],
-                correct: "144/(7R)",
-                unit: "",
-                exp: `$\\dfrac{1}{\\lambda} = R\\left(\\dfrac{1}{3^2} - \\dfrac{1}{4^2}\\right) = R\\cdot\\dfrac{7}{144} \\implies \\lambda = \\dfrac{144}{7R}$`
-              };
-            }
-          },
-          {
-            text: "Two long parallel wires carry currents of {i1} A and {i2} A in opposite directions and are separated by 1 cm. Calculate the force per unit length of repulsion.",
-            gen() {
-              const i1 = 5, i2 = rnd(2, 4);
-              const val = 2 * i2;
-              return {
-                vars: { i1, i2 },
-                choices: [`${val} × 10⁻⁴ N/m`, `${val * 2} × 10⁻⁴ N/m`, `${val - 1} × 10⁻⁴ N/m`, "0 N/m"],
-                correct: `${val} × 10⁻⁴ N/m`,
-                unit: "",
-                exp: `$\\dfrac{F}{l} = \\dfrac{\\mu_0 I_1 I_2}{2\\pi d} = \\dfrac{2\\times10^{-7}\\times${i1}\\times${i2}}{0.01} = ${val}\\times10^{-4}\\text{ N/m}$`
-              };
-            }
-          }
-        ],
-        5: [
-          {
-            text: "The maximum wavelength of the Lyman series for hydrogen corresponds to the transition $n = 2 \\to n = 1$. If $R$ is the Rydberg constant, what is $\\lambda_{max}$?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["4/(3R)", "1/R", "4/R", "3/(4R)"],
-                correct: "4/(3R)",
-                unit: "",
-                exp: `$\\dfrac{1}{\\lambda} = R\\left(1 - \\dfrac{1}{4}\\right) = \\dfrac{3R}{4} \\implies \\lambda_{max} = \\dfrac{4}{3R}$`
-              };
-            }
-          }
-        ]
-      },
+  <!-- ═══════════════════ FOOTER ═══════════════════ -->
+  <footer class="bg-slate-900 text-slate-400 py-6 mt-12">
+    <div class="max-w-screen-2xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row items-center justify-between gap-2 text-[11px]">
+      <div class="flex items-center gap-3">
+        <div class="ku-crest w-6 h-6 text-[8px]">KU</div>
+        <span>© 2026 Kathmandu University, Dhulikhel · Office of the Controller of Examinations</span>
+      </div>
+      <span class="font-mono text-slate-500">KUCAT-CBT Mock Portal v2.6 · Secure Session</span>
+    </div>
+  </footer>
 
-      chemistry: {
-        1: [
-          {
-            text: "Calculate the mass of glucose ($C_6H_{12}O_6$, $M = 180$ g/mol) required to prepare 200 mL of a 0.2 M solution.",
-            gen() {
-              const ans = 7.2;
-              return {
-                vars: {},
-                choices: [7.2, 14.4, 3.6, 18.0],
-                correct: 7.2,
-                unit: " g",
-                exp: `$n = M \\times V = 0.2 \\times 0.200 = 0.04\\text{ mol}$; mass $= 0.04 \\times 180 = 7.2\\text{ g}$`
-              };
-            }
-          },
-          {
-            text: "Which of the following is the correct chemical formula for washing soda?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["Na₂CO₃·10H₂O", "NaHCO₃", "Na₂CO₃·H₂O", "NaOH"],
-                correct: "Na₂CO₃·10H₂O",
-                unit: "",
-                exp: `Washing soda is sodium carbonate decahydrate: $\\text{Na}_2\\text{CO}_3\\cdot10\\text{H}_2\\text{O}$. Baking soda (NaHCO₃) is different.`
-              };
-            }
-          }
-        ],
-        2: [
-          {
-            text: "What is the oxidation state of sodium in sodium amalgam (Na–Hg)?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["0", "+1", "−1", "+2"],
-                correct: "0",
-                unit: "",
-                exp: `Sodium amalgam is an alloy (physical mixture), not a compound. Both Na and Hg remain in their elemental states, so the oxidation state of Na is $0$.`
-              };
-            }
-          },
-          {
-            text: "0.10 mol of $\\text{Na}_2\\text{CO}_3$ is treated with 0.16 mol of HCl. How many moles of $\\text{Na}_2\\text{CO}_3$ remain unreacted?",
-            gen() {
-              return {
-                vars: {},
-                choices: [0.02, 0.04, 0.08, 0.06],
-                correct: 0.02,
-                unit: " mol",
-                exp: `Reaction: $\\text{Na}_2\\text{CO}_3 + 2\\text{HCl} \\to 2\\text{NaCl} + \\text{H}_2\\text{O} + \\text{CO}_2$. 0.16 mol HCl reacts with $\\frac{0.16}{2} = 0.08$ mol Na₂CO₃. Unreacted: $0.10 - 0.08 = 0.02$ mol.`
-              };
-            }
-          }
-        ],
-        3: [
-          {
-            text: "What is the ratio of unpaired electrons in the $d$-orbitals of $\\text{Co}^{2+}$ and $\\text{Cr}^{3+}$?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["1:1", "2:1", "3:1", "3:2"],
-                correct: "1:1",
-                unit: "",
-                exp: `Co²⁺ has configuration $[Ar]3d^7$: 3 unpaired electrons. Cr³⁺ has $[Ar]3d^3$: 3 unpaired electrons. Ratio = 3:3 = $1:1$.`
-              };
-            }
-          },
-          {
-            text: "50 mL of 36 N $\\text{H}_2\\text{SO}_4$ is mixed with 50 mL of pure water. What is the molarity of the resulting solution?",
-            gen() {
-              return {
-                vars: {},
-                choices: [9, 18, 36, 4.5],
-                correct: 9,
-                unit: " M",
-                exp: `$N_1V_1 = N_2V_2 \\implies 36 \\times 50 = N_2 \\times 100 \\implies N_2 = 18\\text{ N}$. Since $n$-factor of $\\text{H}_2\\text{SO}_4$ is 2: Molarity $= 18/2 = 9\\text{ M}$.`
-              };
-            }
-          }
-        ],
-        4: [
-          {
-            text: "Determine the approximate percentage by mass of zinc in white vitriol ($\\text{ZnSO}_4\\cdot7\\text{H}_2\\text{O}$). [$Zn=65$, $S=32$, $O=16$, $H=1$]",
-            gen() {
-              return {
-                vars: {},
-                choices: ["22.65%", "32.56%", "18.12%", "28.33%"],
-                correct: "22.65%",
-                unit: "",
-                exp: `Molar mass of $\\text{ZnSO}_4\\cdot7\\text{H}_2\\text{O} = 65+32+64+126 = 287\\text{ g/mol}$. $\\%\\text{Zn} = \\frac{65}{287}\\times100 \\approx 22.65\\%$`
-              };
-            }
-          },
-          {
-            text: "A metal oxide contains 32% oxygen by mass. What is the equivalent weight of the metal?",
-            gen() {
-              return {
-                vars: {},
-                choices: [17, 32, 16, 8],
-                correct: 17,
-                unit: "",
-                exp: `Metal content $= 100 - 32 = 68\\%$. Equivalent weight $= \\dfrac{68}{32}\\times8 = 17$`
-              };
-            }
-          }
-        ],
-        5: [
-          {
-            text: "Elements A, B, C and D have standard reduction potentials of $-3.04$, $-1.90$, $0.00$, and $+1.90$ V respectively. Which element acts as the strongest reducing agent?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["Element A", "Element B", "Element C", "Element D"],
-                correct: "Element A",
-                unit: "",
-                exp: `A lower standard reduction potential indicates a greater tendency to lose electrons (be oxidised). Element A ($E^\\circ = -3.04\\text{ V}$) has the lowest value and is thus the strongest reducing agent.`
-              };
-            }
-          }
-        ]
-      },
+  </div>
 
-      mathematics: {
-        1: [
-          {
-            text: "Which statistical measure is defined by the expression $E[X^2] - (E[X])^2$?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["Variance", "Standard Deviation", "Mean", "Median"],
-                correct: "Variance",
-                unit: "",
-                exp: `By definition, $\\text{Var}(X) = E[X^2] - (E[X])^2$. This is the second central moment of the distribution.`
-              };
-            }
-          },
-          {
-            text: "Evaluate: $\\displaystyle\\lim_{x \\to 0} \\frac{\\pi^{e^x}}{e^{\\pi^x}}$",
-            gen() {
-              return {
-                vars: {},
-                choices: ["π/e", "e/π", "1", "πe"],
-                correct: "π/e",
-                unit: "",
-                exp: `By direct substitution at $x=0$: $\\dfrac{\\pi^{e^0}}{e^{\\pi^0}} = \\dfrac{\\pi^1}{e^1} = \\dfrac{\\pi}{e}$`
-              };
-            }
-          }
-        ],
-        2: [
-          {
-            text: "For a binomial distribution with $n = 5$ and $p = 0.6$, find the mean.",
-            gen() {
-              const ans = 3.0;
-              return {
-                vars: {},
-                choices: [3.0, 4.0, 2.0, 2.5],
-                correct: 3.0,
-                unit: "",
-                exp: `For a Binomial$(n, p)$ distribution: $\\mu = np = 5 \\times 0.6 = 3.0$`
-              };
-            }
-          },
-          {
-            text: "How many subsets does a set containing {n} elements have?",
-            gen() {
-              const n = rnd(4, 7), ans = Math.pow(2, n);
-              return {
-                vars: { n },
-                choices: [ans, ans * 2, n * n, n * 2],
-                correct: ans,
-                unit: "",
-                exp: `The total number of subsets of a set with $n$ elements is $2^n = 2^{${n}} = ${ans}$.`
-              };
-            }
-          }
-        ],
-        3: [
-          {
-            text: "A dataset of 12 numbers has every element equal to the constant value {val}. What is the standard deviation?",
-            gen() {
-              const val = rnd(2, 10);
-              return {
-                vars: { val },
-                choices: [0, val, val * val, 6],
-                correct: 0,
-                unit: "",
-                exp: `Since all values are identical (no deviation from the mean), the standard deviation is $\\sigma = 0$.`
-              };
-            }
-          },
-          {
-            text: "Let $A$ be any subset of the universal set $U$. What is $A \\cap A'$?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["∅ (Empty Set)", "U (Universal Set)", "A", "A'"],
-                correct: "∅ (Empty Set)",
-                unit: "",
-                exp: `By definition of complementation: $A \\cap A' = \\emptyset$ for any set $A$.`
-              };
-            }
-          }
-        ],
-        4: [
-          {
-            text: "Find the total number of real roots of the equation $x^2 - 5|x| + 6 = 0$.",
-            gen() {
-              return {
-                vars: {},
-                choices: [4, 2, 0, 1],
-                correct: 4,
-                unit: "",
-                exp: `Let $u = |x| \\geq 0$: $u^2 - 5u + 6 = 0 \\implies (u-2)(u-3) = 0 \\implies u = 2$ or $u = 3$. Each yields two real values: $x = \\pm2, \\pm3$. Total: **4 roots**.`
-              };
-            }
-          },
-          {
-            text: "Determine the domain of $f(x) = \\log_3\\left[\\log_4(x - {k})\\right]$.",
-            gen() {
-              const k = rnd(1, 5), bound = k + 1;
-              return {
-                vars: { k },
-                choices: [`x > ${bound}`, `x > ${k}`, `x < ${bound}`, "x > 0"],
-                correct: `x > ${bound}`,
-                unit: "",
-                exp: `Require inner log to be positive: $\\log_4(x-${k}) > 0 \\implies x - ${k} > 4^0 = 1 \\implies x > ${bound}$`
-              };
-            }
-          }
-        ],
-        5: [
-          {
-            text: "Evaluate: $\\displaystyle\\lim_{x \\to 0} \\frac{\\log_{10}(x + 0.1) + 1}{x}$",
-            gen() {
-              return {
-                vars: {},
-                choices: ["10", "1", "0", "ln 10"],
-                correct: "10",
-                unit: "",
-                exp: `Note $\\log_{10}(0.1) + 1 = -1 + 1 = 0$, so the form is $0/0$. By L'Hôpital: $\\lim_{x\\to0}\\dfrac{1}{(x+0.1)\\ln10} = \\dfrac{1}{0.1\\ln10}$. Using $\\log_{10}$ base: $= \\dfrac{\\log_{10}e}{0.1}$... Alternatively, writing as $\\log_{10}10(x+0.1)/x \\to 10$.`
-              };
-            }
-          }
-        ]
-      },
 
-      biology: {
-        1: [
-          {
-            text: "Which organelle is primarily responsible for ATP synthesis through oxidative phosphorylation in eukaryotic cells?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["Mitochondria", "Ribosome", "Nucleus", "Golgi Apparatus"],
-                correct: "Mitochondria",
-                unit: "",
-                exp: `Mitochondria carry out oxidative phosphorylation via the electron transport chain on their inner membrane, generating the majority of cellular ATP.`
-              };
-            }
-          },
-          {
-            text: "In which cellular organelle does the light-dependent reaction of photosynthesis occur?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["Thylakoid membrane", "Stroma of chloroplast", "Cytoplasm", "Mitochondrial matrix"],
-                correct: "Thylakoid membrane",
-                unit: "",
-                exp: `The light-dependent reactions occur on the thylakoid membrane, where chlorophyll absorbs photons to drive photophosphorylation.`
-              };
-            }
-          }
-        ],
-        2: [
-          {
-            text: "Which of the following correctly describes the primary role of stomata in plant physiology?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["Regulation of gas exchange and transpiration", "Absorption of water from soil", "Synthesis of chlorophyll", "Transport of sugars"],
-                correct: "Regulation of gas exchange and transpiration",
-                unit: "",
-                exp: `Stomata (guard cell pores) regulate the exchange of $CO_2$ and $O_2$ required for photosynthesis and respiration, and control water loss via transpiration.`
-              };
-            }
-          },
-          {
-            text: "The physical division of cytoplasm during cell division is termed:",
-            gen() {
-              return {
-                vars: {},
-                choices: ["Cytokinesis", "Karyokinesis", "Prophase", "Telophase"],
-                correct: "Cytokinesis",
-                unit: "",
-                exp: `Cytokinesis refers specifically to cytoplasmic division, which follows karyokinesis (nuclear division) to produce two daughter cells.`
-              };
-            }
-          }
-        ],
-        3: [
-          {
-            text: "Which molecule serves as the primary repository of hereditary information in all known living organisms?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["Deoxyribonucleic acid (DNA)", "Messenger RNA (mRNA)", "Proteins", "Glycogen"],
-                correct: "Deoxyribonucleic acid (DNA)",
-                unit: "",
-                exp: `DNA, by virtue of its stable double-helical structure and complementary base-pairing, stores and transmits genetic information across generations.`
-              };
-            }
-          }
-        ],
-        4: [
-          {
-            text: "During protein synthesis, which RNA molecule decodes the mRNA codon and delivers the appropriate amino acid to the ribosome?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["Transfer RNA (tRNA)", "Messenger RNA (mRNA)", "Ribosomal RNA (rRNA)", "Small nuclear RNA (snRNA)"],
-                correct: "Transfer RNA (tRNA)",
-                unit: "",
-                exp: `tRNA molecules possess an anticodon loop that base-pairs with the mRNA codon, and an amino acid attachment site at the 3' CCA end. They act as adaptors in translation.`
-              };
-            }
-          }
-        ],
-        5: [
-          {
-            text: "Which enzyme catalyses the synthesis of an RNA strand from a DNA template during transcription?",
-            gen() {
-              return {
-                vars: {},
-                choices: ["RNA Polymerase", "DNA Polymerase", "DNA Ligase", "Helicase"],
-                correct: "RNA Polymerase",
-                unit: "",
-                exp: `RNA Polymerase reads the template DNA strand in the 3'→5' direction and synthesises a complementary RNA strand in the 5'→3' direction during transcription.`
-              };
-            }
-          }
-        ]
-      }
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script>
+// ─────────────────────────────────────────────────────────────────────────
+// QUESTION ENGINE
+// ─────────────────────────────────────────────────────────────────────────
+const QE = {
+  bank: {
+    physics: {
+      1: [
+        { text: "A body of mass {m} kg is acted upon by a net force of {f} N. What is the acceleration of the body?",
+          gen() { const m = rnd(2,10), a = rnd(3,12), f = m*a;
+            return { vars:{m,f}, choices:[a, a+3, Math.max(1,a-3), a*2], correct:a, unit:" m/s²",
+              exp:`By Newton's Second Law: $F = ma \\implies a = \\dfrac{F}{m} = \\dfrac{${f}}{${m}} = ${a} \\text{ m/s}^2$` }; } },
+        { text: "A constant force of {f} N displaces an object by {d} m along the direction of the force. Calculate the work done.",
+          gen() { const f = rnd(10,50), d = rnd(2,10), w = f*d;
+            return { vars:{f,d}, choices:[w, w+20, Math.max(0,w-20), f+d], correct:w, unit:" J",
+              exp:`Work done: $W = F \\cdot d = ${f} \\times ${d} = ${w} \\text{ J}$` }; } }
+      ],
+      2: [
+        { text: "An electron is accelerated through a potential difference of {v} V. What kinetic energy does it acquire (in eV)?",
+          gen() { const v = rnd(2,20)*50;
+            return { vars:{v}, choices:[v, v*2, v/2, v*1.6], correct:v, unit:" eV",
+              exp:`For a charge $q = e$ accelerated through $V$ volts: $K.E. = eV = ${v} \\text{ eV}$` }; } },
+        { text: "A wave travels with velocity {v} m/s and has a wavelength of {w} m. Determine its frequency.",
+          gen() { const f = rnd(1,10)*50, w = rnd(2,5), v = f*w;
+            return { vars:{v,w}, choices:[f, f*2, Math.max(10,f-30), f/2], correct:f, unit:" Hz",
+              exp:`Using $v = f\\lambda \\implies f = \\dfrac{v}{\\lambda} = \\dfrac{${v}}{${w}} = ${f} \\text{ Hz}$` }; } }
+      ],
+      3: [
+        { text: "In a series LCR circuit, $V_R = 15$ V, $V_L = {vl}$ V, and $V_C = {vc}$ V. Find the resultant supply voltage.",
+          gen() { const vl = rnd(3,8)*10, vc = vl-20;
+            return { vars:{vl,vc}, choices:[25, 35, 75, vl+vc+15], correct:25, unit:" V",
+              exp:`$V = \\sqrt{V_R^2 + (V_L - V_C)^2} = \\sqrt{15^2 + (${vl} - ${vc})^2} = \\sqrt{225 + 400} = 25\\text{ V}$` }; } },
+        { text: "Two capacitors of {c1} μF and {c2} μF are connected in series. Calculate the equivalent capacitance.",
+          gen() { const c2 = rnd(4,8), c1 = c2*2, ans = +((c1*c2)/(c1+c2)).toFixed(2);
+            return { vars:{c1,c2}, choices:[ans, c1+c2, Math.abs(c1-c2), +(ans*1.5).toFixed(2)], correct:ans, unit:" μF",
+              exp:`Series: $C_{eq} = \\dfrac{C_1 C_2}{C_1 + C_2} = \\dfrac{${c1} \\times ${c2}}{${c1+c2}} = ${ans}\\text{ μF}$` }; } }
+      ],
+      4: [
+        { text: "What is the maximum wavelength (in terms of $R$) for the Paschen series ($n_1 = 3$, $n_2 = 4$) of hydrogen?",
+          gen() { return { vars:{}, choices:["144/(7R)", "36/(5R)", "100/(21R)", "9/R"], correct:"144/(7R)", unit:"",
+              exp:`$\\dfrac{1}{\\lambda} = R\\left(\\dfrac{1}{9} - \\dfrac{1}{16}\\right) = \\dfrac{7R}{144} \\implies \\lambda = \\dfrac{144}{7R}$` }; } },
+        { text: "Two long parallel wires carry currents of {i1} A and {i2} A in opposite directions, 1 cm apart. Calculate the force per unit length of repulsion.",
+          gen() { const i1 = 5, i2 = rnd(2,4), val = 2*i2;
+            return { vars:{i1,i2}, choices:[`${val} × 10⁻⁴ N/m`, `${val*2} × 10⁻⁴ N/m`, `${val-1} × 10⁻⁴ N/m`, "0 N/m"], correct:`${val} × 10⁻⁴ N/m`, unit:"",
+              exp:`$\\dfrac{F}{l} = \\dfrac{\\mu_0 I_1 I_2}{2\\pi d} = \\dfrac{2\\times10^{-7}\\times${i1}\\times${i2}}{0.01} = ${val}\\times10^{-4}\\text{ N/m}$` }; } }
+      ],
+      5: [
+        { text: "The Lyman series maximum wavelength corresponds to $n=2 \\to n=1$. In terms of $R$, what is $\\lambda_{max}$?",
+          gen() { return { vars:{}, choices:["4/(3R)", "1/R", "4/R", "3/(4R)"], correct:"4/(3R)", unit:"",
+              exp:`$\\dfrac{1}{\\lambda} = R\\left(1 - \\dfrac{1}{4}\\right) = \\dfrac{3R}{4} \\implies \\lambda_{max} = \\dfrac{4}{3R}$` }; } }
+      ]
     },
-
-    getQuestion(subject, level) {
-      const pool = this.bank[subject][level] || this.bank[subject][Math.max(1, level - 1)] || this.bank[subject][1];
-      const tpl  = pool[Math.floor(Math.random() * pool.length)];
-      const data = tpl.gen();
-
-      // Substitute vars into text
-      let text = tpl.text;
-      for (const [k, v] of Object.entries(data.vars || {}))
-        text = text.replaceAll(`{${k}}`, v);
-
-      // Build & deduplicate choices
-      let choices = [...new Set(data.choices)].map(c => ({ raw: c, display: `${c}${data.unit || ""}` }));
-      while (choices.length < 4) {
-        const fake = typeof data.correct === 'number' ? data.correct + choices.length * 7 : `${data.correct}_${choices.length}`;
-        choices.push({ raw: fake, display: `${fake}${data.unit || ""}` });
-      }
-
-      // Shuffle
-      for (let i = choices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [choices[i], choices[j]] = [choices[j], choices[i]];
-      }
-
-      const correctIdx = choices.findIndex(c => c.raw === data.correct);
-
-      return {
-        text,
-        choices: choices.map(c => c.display),
-        correctIndex: correctIdx >= 0 ? correctIdx : 0,
-        explanation: data.exp,
-        level
-      };
+    chemistry: {
+      1: [
+        { text: "Calculate the mass of glucose ($C_6H_{12}O_6$, $M = 180$ g/mol) required to prepare 200 mL of a 0.2 M solution.",
+          gen() { return { vars:{}, choices:[7.2, 14.4, 3.6, 18.0], correct:7.2, unit:" g",
+              exp:`$n = M \\times V = 0.2 \\times 0.2 = 0.04$ mol; mass $= 0.04 \\times 180 = 7.2$ g` }; } },
+        { text: "Which of the following is the correct chemical formula for washing soda?",
+          gen() { return { vars:{}, choices:["Na₂CO₃·10H₂O", "NaHCO₃", "Na₂CO₃·H₂O", "NaOH"], correct:"Na₂CO₃·10H₂O", unit:"",
+              exp:`Washing soda is sodium carbonate decahydrate: $\\text{Na}_2\\text{CO}_3 \\cdot 10\\text{H}_2\\text{O}$.` }; } }
+      ],
+      2: [
+        { text: "What is the oxidation state of sodium in sodium amalgam (Na–Hg)?",
+          gen() { return { vars:{}, choices:["0", "+1", "−1", "+2"], correct:"0", unit:"",
+              exp:`Sodium amalgam is an alloy (physical mixture), so Na remains in its elemental state with oxidation state $0$.` }; } },
+        { text: "0.10 mol of $\\text{Na}_2\\text{CO}_3$ is treated with 0.16 mol of HCl. How many moles of $\\text{Na}_2\\text{CO}_3$ remain unreacted?",
+          gen() { return { vars:{}, choices:[0.02, 0.04, 0.08, 0.06], correct:0.02, unit:" mol",
+              exp:`$\\text{Na}_2\\text{CO}_3 + 2\\text{HCl} \\to 2\\text{NaCl} + \\text{H}_2\\text{O} + \\text{CO}_2$. 0.16 mol HCl reacts with 0.08 mol Na₂CO₃. Unreacted: $0.10 - 0.08 = 0.02$ mol.` }; } }
+      ],
+      3: [
+        { text: "What is the ratio of unpaired electrons in the $d$-orbitals of $\\text{Co}^{2+}$ and $\\text{Cr}^{3+}$?",
+          gen() { return { vars:{}, choices:["1:1", "2:1", "3:1", "3:2"], correct:"1:1", unit:"",
+              exp:`Co²⁺ is $3d^7$ (3 unpaired); Cr³⁺ is $3d^3$ (3 unpaired). Ratio $= 1:1$.` }; } },
+        { text: "50 mL of 36 N $\\text{H}_2\\text{SO}_4$ is mixed with 50 mL of water. What is the molarity of the resulting solution?",
+          gen() { return { vars:{}, choices:[9, 18, 36, 4.5], correct:9, unit:" M",
+              exp:`$N_2 = (36 \\times 50)/100 = 18$ N. Molarity $= N/n\\text{-factor} = 18/2 = 9$ M.` }; } }
+      ],
+      4: [
+        { text: "Determine the approximate percentage by mass of zinc in white vitriol ($\\text{ZnSO}_4 \\cdot 7\\text{H}_2\\text{O}$). [$Zn=65, S=32, O=16, H=1$]",
+          gen() { return { vars:{}, choices:["22.65%", "32.56%", "18.12%", "28.33%"], correct:"22.65%", unit:"",
+              exp:`Molar mass $= 65+32+64+126 = 287$. $\\%Zn = (65/287) \\times 100 \\approx 22.65\\%$` }; } },
+        { text: "A metal oxide contains 32% oxygen by mass. What is the equivalent weight of the metal?",
+          gen() { return { vars:{}, choices:[17, 32, 16, 8], correct:17, unit:"",
+              exp:`Equivalent weight $= (68/32) \\times 8 = 17$` }; } }
+      ],
+      5: [
+        { text: "Elements A, B, C, D have $E^\\circ$ values $-3.04$, $-1.90$, $0.00$, $+1.90$ V respectively. Which is the strongest reducing agent?",
+          gen() { return { vars:{}, choices:["Element A", "Element B", "Element C", "Element D"], correct:"Element A", unit:"",
+              exp:`Lowest standard reduction potential → strongest reducing agent. Element A ($-3.04$ V) is the strongest.` }; } }
+      ]
+    },
+    mathematics: {
+      1: [
+        { text: "Which statistical measure is defined as $E[X^2] - (E[X])^2$?",
+          gen() { return { vars:{}, choices:["Variance", "Standard Deviation", "Mean", "Median"], correct:"Variance", unit:"",
+              exp:`By definition: $\\text{Var}(X) = E[X^2] - (E[X])^2$` }; } },
+        { text: "Evaluate: $\\displaystyle\\lim_{x \\to 0} \\dfrac{\\pi^{e^x}}{e^{\\pi^x}}$",
+          gen() { return { vars:{}, choices:["π/e", "e/π", "1", "πe"], correct:"π/e", unit:"",
+              exp:`At $x=0$: $\\dfrac{\\pi^{e^0}}{e^{\\pi^0}} = \\dfrac{\\pi}{e}$` }; } }
+      ],
+      2: [
+        { text: "For a binomial distribution with $n = 5$ and $p = 0.6$, find the mean.",
+          gen() { return { vars:{}, choices:[3.0, 4.0, 2.0, 2.5], correct:3.0, unit:"",
+              exp:`Mean $= np = 5 \\times 0.6 = 3.0$` }; } },
+        { text: "How many subsets does a set with {n} elements have?",
+          gen() { const n = rnd(4,7), ans = Math.pow(2,n);
+            return { vars:{n}, choices:[ans, ans*2, n*n, n*2], correct:ans, unit:"",
+              exp:`Total subsets $= 2^n = 2^{${n}} = ${ans}$` }; } }
+      ],
+      3: [
+        { text: "A dataset of 12 numbers has every element equal to {val}. What is the standard deviation?",
+          gen() { const val = rnd(2,10);
+            return { vars:{val}, choices:[0, val, val*val, 6], correct:0, unit:"",
+              exp:`No deviation from mean ⟹ standard deviation $= 0$.` }; } },
+        { text: "Let $A$ be any subset of the universal set $U$. What is $A \\cap A'$?",
+          gen() { return { vars:{}, choices:["∅ (Empty Set)", "U", "A", "A'"], correct:"∅ (Empty Set)", unit:"",
+              exp:`By definition: $A \\cap A' = \\emptyset$` }; } }
+      ],
+      4: [
+        { text: "Find the total number of real roots of $x^2 - 5|x| + 6 = 0$.",
+          gen() { return { vars:{}, choices:[4, 2, 0, 1], correct:4, unit:"",
+              exp:`Let $u = |x|$: $u^2 - 5u + 6 = 0 \\implies u = 2, 3$, giving $x = \\pm 2, \\pm 3$. Total: **4**.` }; } },
+        { text: "Find the domain of $f(x) = \\log_3[\\log_4(x - {k})]$.",
+          gen() { const k = rnd(1,5), bound = k+1;
+            return { vars:{k}, choices:[`x > ${bound}`, `x > ${k}`, `x < ${bound}`, "x > 0"], correct:`x > ${bound}`, unit:"",
+              exp:`$\\log_4(x-${k}) > 0 \\implies x - ${k} > 1 \\implies x > ${bound}$` }; } }
+      ],
+      5: [
+        { text: "Evaluate: $\\displaystyle\\lim_{x \\to 0} \\dfrac{\\log_{10}(x + 0.1) + 1}{x}$",
+          gen() { return { vars:{}, choices:["10", "1", "0", "ln 10"], correct:"10", unit:"",
+              exp:`Form $0/0$ at $x=0$. Equivalent to $\\log_{10}[10(x+0.1)]/x \\to 10$.` }; } }
+      ]
+    },
+    biology: {
+      1: [
+        { text: "Which organelle is primarily responsible for ATP synthesis through oxidative phosphorylation in eukaryotic cells?",
+          gen() { return { vars:{}, choices:["Mitochondria", "Ribosome", "Nucleus", "Golgi Apparatus"], correct:"Mitochondria", unit:"",
+              exp:`Mitochondria produce ATP via oxidative phosphorylation on the inner membrane through the electron transport chain.` }; } },
+        { text: "Where do the light-dependent reactions of photosynthesis occur?",
+          gen() { return { vars:{}, choices:["Thylakoid membrane", "Stroma", "Cytoplasm", "Mitochondrial matrix"], correct:"Thylakoid membrane", unit:"",
+              exp:`Light reactions occur on the thylakoid membrane where chlorophyll absorbs photons.` }; } }
+      ],
+      2: [
+        { text: "What is the primary physiological function of stomata in plants?",
+          gen() { return { vars:{}, choices:["Gas exchange and transpiration", "Water absorption", "Chlorophyll synthesis", "Sugar transport"], correct:"Gas exchange and transpiration", unit:"",
+              exp:`Stomata regulate exchange of $CO_2/O_2$ and water vapour loss (transpiration).` }; } },
+        { text: "The physical division of cytoplasm during cell division is termed:",
+          gen() { return { vars:{}, choices:["Cytokinesis", "Karyokinesis", "Prophase", "Telophase"], correct:"Cytokinesis", unit:"",
+              exp:`Cytokinesis follows karyokinesis (nuclear division) to physically divide the cytoplasm.` }; } }
+      ],
+      3: [
+        { text: "Which molecule serves as the universal repository of hereditary information in living organisms?",
+          gen() { return { vars:{}, choices:["DNA", "mRNA", "Proteins", "Glycogen"], correct:"DNA", unit:"",
+              exp:`DNA's stable double helix and complementary base-pairing make it the universal genetic blueprint.` }; } }
+      ],
+      4: [
+        { text: "Which RNA decodes the mRNA codon and delivers amino acids to the ribosome during translation?",
+          gen() { return { vars:{}, choices:["tRNA", "mRNA", "rRNA", "snRNA"], correct:"tRNA", unit:"",
+              exp:`tRNA molecules base-pair with mRNA codons through their anticodon loop and carry specific amino acids.` }; } }
+      ],
+      5: [
+        { text: "Which enzyme synthesises RNA from a DNA template during transcription?",
+          gen() { return { vars:{}, choices:["RNA Polymerase", "DNA Polymerase", "DNA Ligase", "Helicase"], correct:"RNA Polymerase", unit:"",
+              exp:`RNA Polymerase reads template DNA (3'→5') and synthesises complementary RNA (5'→3').` }; } }
+      ]
     }
-  };
+  },
 
-  function rnd(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // EXAM STATE
-  // ─────────────────────────────────────────────────────────────────────────────
-  const Exam = {
-    username: "",
-    stream: "pcm",
-    timerInterval: null,
-    secondsLeft: 7200,
-    activeSubject: "",
-
-    subjects: {
-      physics:     { name: "Physics",     currentIdx: 0, difficulty: 1, questions: [], responses: {}, score: 0 },
-      chemistry:   { name: "Chemistry",   currentIdx: 0, difficulty: 1, questions: [], responses: {}, score: 0 },
-      mathematics: { name: "Mathematics", currentIdx: 0, difficulty: 1, questions: [], responses: {}, score: 0 },
-      biology:     { name: "Biology",     currentIdx: 0, difficulty: 1, questions: [], responses: {}, score: 0 },
-    },
-
-    SCORE_MAP: { 1: 11, 2: 13, 3: 15, 4: 17, 5: 19 },
-
-    init(username, stream) {
-      this.username = username;
-      this.stream   = stream;
-      this.secondsLeft = 7200;
-
-      if (stream === "pcm") {
-        this.activeSubject = "physics";
-        delete this.subjects.biology;
-      } else {
-        this.activeSubject = "physics";
-        delete this.subjects.mathematics;
-      }
-
-      for (const key of Object.keys(this.subjects)) {
-        const s = this.subjects[key];
-        s.currentIdx = 0; s.difficulty = 1;
-        s.questions  = [QE.getQuestion(key, 1)];
-        s.responses  = {}; s.score = 0;
-      }
-
-      this.startTimer();
-    },
-
-    startTimer() {
-      clearInterval(this.timerInterval);
-      this.timerInterval = setInterval(() => {
-        this.secondsLeft--;
-        this.renderTimer();
-        if (this.secondsLeft <= 0) { clearInterval(this.timerInterval); this.finalise(); }
-      }, 1000);
-    },
-
-    renderTimer() {
-      const m = String(Math.floor(this.secondsLeft / 60)).padStart(2, "0");
-      const s = String(this.secondsLeft % 60).padStart(2, "0");
-      const el = document.getElementById("timer-display");
-      if (!el) return;
-      el.textContent = `${m}:${s}`;
-      const box = document.getElementById("timer-box");
-      if (this.secondsLeft <= 300) {
-        box.classList.add("timer-urgent", "!border-red-300", "!text-red-700");
-      }
-    },
-
-    get activeSubjectObj() { return this.subjects[this.activeSubject]; },
-
-    totalAnswered() {
-      return Object.values(this.subjects).reduce((a, s) => a + s.currentIdx, 0);
-    },
-
-    totalScore() {
-      return Object.values(this.subjects).reduce((a, s) => a + s.score, 0);
-    },
-
-    submit(chosenIdx) {
-      const s = this.activeSubjectObj;
-      const q = s.questions[s.currentIdx];
-      s.responses[s.currentIdx] = chosenIdx;
-
-      if (chosenIdx === q.correctIndex) s.score += this.SCORE_MAP[q.level];
-
-      const nextDiff = chosenIdx === q.correctIndex
-        ? Math.min(5, q.level + 1)
-        : Math.max(1, q.level - 1);
-
-      s.currentIdx++;
-      if (s.currentIdx < 40) {
-        s.difficulty = nextDiff;
-        s.questions.push(QE.getQuestion(this.activeSubject, nextDiff));
-      }
-    },
-
-    finalise() {
-      clearInterval(this.timerInterval);
-      document.getElementById("phase-exam").classList.add("hidden");
-      document.getElementById("phase-results").classList.remove("hidden");
-      document.getElementById("timer-box").style.display = "none";
-      buildResults();
+  getQuestion(subject, level) {
+    const pool = this.bank[subject][level] || this.bank[subject][Math.max(1, level-1)] || this.bank[subject][1];
+    const tpl = pool[Math.floor(Math.random() * pool.length)];
+    const data = tpl.gen();
+    let text = tpl.text;
+    for (const [k,v] of Object.entries(data.vars || {})) text = text.replaceAll(`{${k}}`, v);
+    let choices = [...new Set(data.choices)].map(c => ({ raw:c, display:`${c}${data.unit||""}` }));
+    while (choices.length < 4) {
+      const fake = typeof data.correct === 'number' ? data.correct + choices.length*7 : `${data.correct}_${choices.length}`;
+      choices.push({ raw:fake, display:`${fake}${data.unit||""}` });
     }
-  };
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // UI RENDERING
-  // ─────────────────────────────────────────────────────────────────────────────
-  let chosenOption = null;
-
-  function renderTabs() {
-    const c = document.getElementById("subject-tabs");
-    c.innerHTML = "";
-    for (const [key, obj] of Object.entries(Exam.subjects)) {
-      const isActive = key === Exam.activeSubject;
-      const isDone   = obj.currentIdx >= 40;
-      const btn = document.createElement("button");
-      btn.textContent = obj.name;
-      btn.className = [
-        "px-4 h-full text-[11px] font-bold uppercase tracking-wide border-b-2 transition-colors",
-        isActive
-          ? "border-blue-800 text-blue-900 dark:text-blue-300 dark:border-blue-400"
-          : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-300",
-        isDone ? "opacity-50" : ""
-      ].join(" ");
-      btn.addEventListener("click", () => {
-        Exam.activeSubject = key;
-        chosenOption = null;
-        renderAll();
-      });
-      c.appendChild(btn);
+    for (let i = choices.length-1; i > 0; i--) {
+      const j = Math.floor(Math.random()*(i+1));
+      [choices[i], choices[j]] = [choices[j], choices[i]];
     }
+    const correctIdx = choices.findIndex(c => c.raw === data.correct);
+    return { text, choices: choices.map(c => c.display), correctIndex: correctIdx >= 0 ? correctIdx : 0, explanation: data.exp, level };
   }
+};
 
-  const DIFF_STYLES = {
-    1: { pill: "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30", label: "Tier 1 — Foundational" },
-    2: { pill: "bg-teal-50 text-teal-700 border border-teal-200 dark:bg-teal-950/30 dark:text-teal-400 dark:border-teal-900/30",   label: "Tier 2 — Elementary" },
-    3: { pill: "bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-400 dark:border-blue-900/30",    label: "Tier 3 — Intermediate" },
-    4: { pill: "bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/30 dark:text-purple-400 dark:border-purple-900/30", label: "Tier 4 — Advanced" },
-    5: { pill: "bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/30 dark:text-rose-400 dark:border-rose-900/30",   label: "Tier 5 — Expert" }
-  };
+function rnd(min, max) { return Math.floor(Math.random()*(max-min+1)) + min; }
 
-  function renderQuestion() {
-    const s = Exam.activeSubjectObj;
+// ─────────────────────────────────────────────────────────────────────────
+// EXAM STATE
+// ─────────────────────────────────────────────────────────────────────────
+const Exam = {
+  username: "",
+  stream: "pcm",
+  timerInterval: null,
+  secondsLeft: 7200,
+  activeSubject: "",
+  subjects: {
+    physics:     { name:"Physics",     currentIdx:0, difficulty:1, questions:[], responses:{}, score:0 },
+    chemistry:   { name:"Chemistry",   currentIdx:0, difficulty:1, questions:[], responses:{}, score:0 },
+    mathematics: { name:"Mathematics", currentIdx:0, difficulty:1, questions:[], responses:{}, score:0 },
+    biology:     { name:"Biology",     currentIdx:0, difficulty:1, questions:[], responses:{}, score:0 }
+  },
+  SCORE_MAP: { 1:11, 2:13, 3:15, 4:17, 5:19 },
 
-    document.getElementById("q-subject-label").textContent = s.name.toUpperCase();
-    document.getElementById("q-index-label").textContent   = `Question ${s.currentIdx + 1} of 40`;
-
-    const pill = document.getElementById("difficulty-pill");
-    const btn  = document.getElementById("btn-submit-next");
-
-    // Subject complete
-    if (s.currentIdx >= 40) {
-      document.getElementById("question-text").innerHTML = `
-        <div class="flex flex-col items-center justify-center py-16 text-center gap-4">
-          <div class="w-14 h-14 rounded-full flex items-center justify-center bg-green-100 dark:bg-green-950/30">
-            <svg class="w-7 h-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path d="M5 13l4 4L19 7"/>
-            </svg>
-          </div>
-          <div>
-            <p class="text-base font-bold text-slate-700 dark:text-slate-200">${s.name} — Section Complete</p>
-            <p class="text-sm text-slate-400 mt-1 max-w-xs">All 40 questions in this section have been answered. Please proceed to the next subject tab.</p>
-          </div>
-        </div>`;
-      document.getElementById("options-container").innerHTML = "";
-      pill.className = "hidden";
-      btn.classList.add("hidden");
-      return;
+  init(username, stream) {
+    this.username = username;
+    this.stream = stream;
+    this.secondsLeft = 7200;
+    if (stream === "pcm") { this.activeSubject = "physics"; delete this.subjects.biology; }
+    else { this.activeSubject = "physics"; delete this.subjects.mathematics; }
+    for (const key of Object.keys(this.subjects)) {
+      const s = this.subjects[key];
+      s.currentIdx = 0; s.difficulty = 1;
+      s.questions = [QE.getQuestion(key, 1)];
+      s.responses = {}; s.score = 0;
     }
+    this.startTimer();
+  },
 
-    btn.classList.remove("hidden");
-    btn.disabled = true;
+  startTimer() {
+    clearInterval(this.timerInterval);
+    this.timerInterval = setInterval(() => {
+      this.secondsLeft--;
+      this.renderTimer();
+      if (this.secondsLeft <= 0) { clearInterval(this.timerInterval); this.finalise(); }
+    }, 1000);
+  },
 
+  renderTimer() {
+    const m = String(Math.floor(this.secondsLeft/60)).padStart(2,"0");
+    const s = String(this.secondsLeft%60).padStart(2,"0");
+    const el = document.getElementById("timer-display");
+    if (el) el.textContent = `${m}:${s}`;
+    const box = document.getElementById("timer-box");
+    if (this.secondsLeft <= 300 && box) box.classList.add("timer-urgent");
+  },
+
+  get activeSubjectObj() { return this.subjects[this.activeSubject]; },
+  totalAnswered() { return Object.values(this.subjects).reduce((a,s) => a + s.currentIdx, 0); },
+  totalScore() { return Object.values(this.subjects).reduce((a,s) => a + s.score, 0); },
+
+  submit(chosenIdx) {
+    const s = this.activeSubjectObj;
     const q = s.questions[s.currentIdx];
-    const ds = DIFF_STYLES[q.level];
-
-    pill.className = `flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase transition-all ${ds.pill}`;
-    pill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-current"></span>${ds.label}`;
-
-    document.getElementById("question-text").innerHTML = q.text;
-
-    const oc = document.getElementById("options-container");
-    oc.innerHTML = "";
-    const labels = ["A", "B", "C", "D"];
-
-    q.choices.forEach((choice, idx) => {
-      const btn2 = document.createElement("button");
-      btn2.className = "option-btn w-full text-left flex items-center gap-3.5 px-4 py-3.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/40 transition-all";
-      btn2.dataset.idx = idx;
-      btn2.innerHTML = `
-        <div class="w-6 h-6 shrink-0 rounded-full border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center text-[10px] font-black text-slate-500 dark:text-slate-400 option-label transition-all">
-          ${labels[idx]}
-        </div>
-        <span class="text-sm leading-relaxed text-slate-800 dark:text-slate-100">${choice}</span>
-      `;
-      btn2.addEventListener("click", () => selectOpt(idx));
-      oc.appendChild(btn2);
-    });
-
-    typeset([document.getElementById("question-text"), oc]);
-  }
-
-  function selectOpt(idx) {
-    chosenOption = idx;
-    document.querySelectorAll(".option-btn").forEach((b, i) => {
-      const ring = b.querySelector(".option-label");
-      if (i === idx) {
-        b.classList.add("selected");
-        b.classList.remove("border-slate-200", "dark:border-slate-700");
-        ring.classList.add("border-blue-700", "text-blue-700", "dark:border-blue-400", "dark:text-blue-400");
-        ring.classList.remove("border-slate-300");
-      } else {
-        b.classList.remove("selected");
-        b.classList.add("border-slate-200", "dark:border-slate-700");
-        ring.classList.remove("border-blue-700", "text-blue-700", "dark:border-blue-400", "dark:text-blue-400");
-        ring.classList.add("border-slate-300");
-      }
-    });
-    document.getElementById("btn-submit-next").disabled = false;
-  }
-
-  function renderGrid() {
-    const s = Exam.activeSubjectObj;
-    document.getElementById("grid-subject-label").textContent = `${s.name}`;
-
-    const grid = document.getElementById("question-grid");
-    grid.innerHTML = "";
-    for (let i = 0; i < 40; i++) {
-      const cell = document.createElement("div");
-      cell.className = "q-cell " + (i < s.currentIdx ? "answered" : i === s.currentIdx ? "current" : "unanswered");
-      cell.textContent = i + 1;
-      grid.appendChild(cell);
+    s.responses[s.currentIdx] = chosenIdx;
+    if (chosenIdx === q.correctIndex) s.score += this.SCORE_MAP[q.level];
+    const nextDiff = chosenIdx === q.correctIndex ? Math.min(5, q.level+1) : Math.max(1, q.level-1);
+    s.currentIdx++;
+    if (s.currentIdx < 40) {
+      s.difficulty = nextDiff;
+      s.questions.push(QE.getQuestion(this.activeSubject, nextDiff));
     }
+  },
 
-    // Overall
-    const answered = Exam.totalAnswered();
-    document.getElementById("overall-count").textContent = `${answered} / 120`;
-    document.getElementById("overall-bar").style.width = `${(answered / 120) * 100}%`;
+  finalise() {
+    clearInterval(this.timerInterval);
+    document.getElementById("phase-exam").classList.add("hidden");
+    document.getElementById("phase-results").classList.remove("hidden");
+    document.getElementById("timer-box").style.display = "none";
+    buildResults();
   }
+};
 
-  function renderAll() {
-    renderTabs();
-    renderQuestion();
-    renderGrid();
-  }
+// ─────────────────────────────────────────────────────────────────────────
+// UI RENDERING
+// ─────────────────────────────────────────────────────────────────────────
+let chosenOption = null;
 
-  // ─────────────────────────────────────────────────────────────────────────────
-  // RESULTS BUILDER
-  // ─────────────────────────────────────────────────────────────────────────────
-  function buildResults() {
-    const total    = Exam.totalScore();
-    const answered = Exam.totalAnswered();
-    const timeUsed = 7200 - Exam.secondsLeft;
-    const m = String(Math.floor(timeUsed / 60)).padStart(2, "0");
-    const s = String(timeUsed % 60).padStart(2, "0");
-
-    document.getElementById("res-total-score").textContent = total;
-    document.getElementById("res-time").textContent = `${m}:${s}`;
-
-    const badge = document.getElementById("res-pass-badge");
-    if (total >= 528) {
-      badge.textContent = "QUALIFIED";
-      badge.className = "inline-block px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-widest result-pass";
-    } else {
-      badge.textContent = "NOT QUALIFIED";
-      badge.className = "inline-block px-5 py-1.5 rounded-full text-xs font-black uppercase tracking-widest result-fail";
-    }
-
-    let totalCorrect = 0, peakLevel = 1;
-    const tierStats  = { 1: { seen:0, correct:0 }, 2: { seen:0, correct:0 }, 3: { seen:0, correct:0 }, 4: { seen:0, correct:0 }, 5: { seen:0, correct:0 } };
-    const tbody      = document.getElementById("res-subject-rows");
-    tbody.innerHTML  = "";
-
-    for (const [key, sub] of Object.entries(Exam.subjects)) {
-      let correct = 0;
-      for (let i = 0; i < sub.currentIdx; i++) {
-        const q = sub.questions[i];
-        const ok = sub.responses[i] === q.correctIndex;
-        if (q.level > peakLevel) peakLevel = q.level;
-        tierStats[q.level].seen++;
-        if (ok) { correct++; totalCorrect++; tierStats[q.level].correct++; }
-      }
-      const acc = sub.currentIdx > 0 ? Math.round((correct / sub.currentIdx) * 100) : 0;
-      const tr = document.createElement("tr");
-      tr.className = "hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors";
-      tr.innerHTML = `
-        <td class="px-5 py-3.5 font-semibold text-slate-800 dark:text-slate-200">${sub.name}</td>
-        <td class="px-5 py-3.5 text-center text-slate-600 dark:text-slate-400 font-mono text-sm">${sub.currentIdx}/40</td>
-        <td class="px-5 py-3.5 text-center font-bold text-green-700 dark:text-green-400">${correct}</td>
-        <td class="px-5 py-3.5 text-center font-semibold text-slate-600 dark:text-slate-400">${acc}%</td>
-        <td class="px-5 py-3.5 text-right font-black text-slate-900 dark:text-white">${sub.score}</td>
-      `;
-      tbody.appendChild(tr);
-    }
-
-    const overallAcc = answered > 0 ? Math.round((totalCorrect / answered) * 100) : 0;
-    document.getElementById("res-correct").textContent  = `${totalCorrect}/${answered}`;
-    document.getElementById("res-accuracy").textContent = `Accuracy: ${overallAcc}%`;
-    document.getElementById("res-peak").textContent     = `Level ${peakLevel}`;
-
-    // Tier distribution
-    const tc = document.getElementById("res-tier-distribution");
-    tc.innerHTML = "";
-    const tierColors = { 1:"bg-emerald-500", 2:"bg-teal-500", 3:"bg-blue-500", 4:"bg-purple-500", 5:"bg-rose-500" };
-    const tierLabels = { 1:"Foundational", 2:"Elementary", 3:"Intermediate", 4:"Advanced", 5:"Expert" };
-    for (let l = 1; l <= 5; l++) {
-      const ts  = tierStats[l];
-      const pct = ts.seen > 0 ? Math.round((ts.correct / ts.seen) * 100) : 0;
-      const d   = document.createElement("div");
-      d.className = "bg-slate-50 dark:bg-slate-800/60 rounded-lg border border-slate-100 dark:border-slate-800 p-3.5 space-y-2.5";
-      d.innerHTML = `
-        <div class="text-[10px] font-black uppercase tracking-wider text-slate-500">Tier ${l}</div>
-        <div class="text-[10px] text-slate-400 -mt-1">${tierLabels[l]}</div>
-        <div class="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-          <div class="h-full ${tierColors[l]} rounded-full" style="width:${pct}%"></div>
-        </div>
-        <div class="text-[10px] text-slate-500 font-semibold">${ts.correct}/${ts.seen} correct &nbsp;·&nbsp; ${pct}%</div>
-      `;
-      tc.appendChild(d);
-    }
-
-    // Detailed review
-    const rc = document.getElementById("res-review");
-    rc.innerHTML = "";
-    const optLabels = ["A", "B", "C", "D"];
-
-    for (const [key, sub] of Object.entries(Exam.subjects)) {
-      if (sub.currentIdx === 0) continue;
-
-      const hd = document.createElement("div");
-      hd.className = "pb-1";
-      hd.innerHTML = `<span class="text-[11px] font-black uppercase tracking-widest" style="color:#1a3a6b;">${sub.name} — Review</span>`;
-      rc.appendChild(hd);
-
-      for (let i = 0; i < sub.currentIdx; i++) {
-        const q  = sub.questions[i];
-        const r  = sub.responses[i];
-        const ok = r === q.correctIndex;
-
-        const item = document.createElement("div");
-        item.className = `rounded-lg border p-4 space-y-3 ${ok
-          ? "border-green-100 dark:border-green-900/30 bg-green-50/40 dark:bg-green-950/10"
-          : "border-rose-100 dark:border-rose-900/30 bg-rose-50/40 dark:bg-rose-950/10"}`;
-
-        const optHtml = q.choices.map((ch, idx) => {
-          let cls = "text-slate-600 dark:text-slate-400";
-          if (idx === q.correctIndex) cls = "text-green-700 dark:text-green-400 font-bold";
-          else if (idx === r && !ok) cls = "text-rose-700 dark:text-rose-400 font-semibold line-through";
-          return `<div class="flex gap-2 text-[11px] ${cls}"><span class="font-black w-4 shrink-0">${optLabels[idx]}.</span><span>${ch}</span></div>`;
-        }).join("");
-
-        item.innerHTML = `
-          <div class="flex items-center justify-between">
-            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">Q${i+1} &nbsp;·&nbsp; ${DIFF_STYLES[q.level].label}</span>
-            <span class="text-[10px] font-black uppercase ${ok ? 'text-green-600' : 'text-rose-600'}">${ok ? '✓ Correct' : '✗ Incorrect'}</span>
-          </div>
-          <p class="text-sm font-medium leading-relaxed text-slate-800 dark:text-slate-100 overflow-x-auto">${q.text}</p>
-          <div class="grid grid-cols-2 gap-1.5 bg-white/60 dark:bg-slate-900/40 p-3 rounded-lg border border-slate-100 dark:border-slate-800">${optHtml}</div>
-          <div class="bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700 rounded-lg p-3">
-            <p class="text-[10px] font-black uppercase tracking-wider text-slate-400 mb-1.5">Solution & Explanation</p>
-            <p class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300 overflow-x-auto">${q.explanation}</p>
-          </div>`;
-        rc.appendChild(item);
-      }
-    }
-
-    typeset([rc]);
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // HELPERS
-  // ─────────────────────────────────────────────────────────────────────────────
-  function typeset(nodes) {
-    if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise(nodes);
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────────
-  // BOOTSTRAP
-  // ─────────────────────────────────────────────────────────────────────────────
-  document.addEventListener("DOMContentLoaded", () => {
-
-    // Theme
-    const root   = document.documentElement;
-    const stored = localStorage.getItem("ku-theme");
-    if (stored === "dark" || (!stored && window.matchMedia("(prefers-color-scheme: dark)").matches))
-      root.classList.add("dark");
-
-    document.getElementById("theme-toggle").addEventListener("click", () => {
-      root.classList.toggle("dark");
-      localStorage.setItem("ku-theme", root.classList.contains("dark") ? "dark" : "light");
-    });
-
-    // Stream radio
-    function updateStreamUI() {
-      const val     = document.querySelector('input[name="stream"]:checked').value;
-      const lblPCM  = document.getElementById("lbl-pcm");
-      const lblPCB  = document.getElementById("lbl-pcb");
-      const ringPCM = document.getElementById("ring-pcm");
-      const ringPCB = document.getElementById("ring-pcb");
-
-      if (val === "pcm") {
-        lblPCM.className = lblPCM.className.replace("border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50", "");
-        lblPCM.style.borderColor = "#1a3a6b";
-        lblPCM.style.background  = "";
-        lblPCB.style.borderColor = "";
-        lblPCB.style.background  = "";
-        ringPCM.innerHTML = `<div class="w-2 h-2 rounded-full bg-blue-700"></div>`;
-        ringPCB.innerHTML = "";
-        ringPCM.style.borderColor = "#1a3a6b";
-        ringPCB.style.borderColor = "";
-      } else {
-        lblPCB.style.borderColor = "#1a3a6b";
-        lblPCM.style.borderColor = "";
-        ringPCB.innerHTML = `<div class="w-2 h-2 rounded-full bg-blue-700"></div>`;
-        ringPCM.innerHTML = "";
-        ringPCB.style.borderColor = "#1a3a6b";
-        ringPCM.style.borderColor = "";
-      }
-    }
-    updateStreamUI();
-    document.querySelectorAll('input[name="stream"]').forEach(r =>
-      r.addEventListener("change", updateStreamUI)
-    );
-    document.getElementById("lbl-pcm").addEventListener("click",
-      () => { document.querySelector('#lbl-pcm input').checked = true; updateStreamUI(); });
-    document.getElementById("lbl-pcb").addEventListener("click",
-      () => { document.querySelector('#lbl-pcb input').checked = true; updateStreamUI(); });
-
-    // Login submit
-    document.getElementById("login-form").addEventListener("submit", e => {
-      e.preventDefault();
-      const username = document.getElementById("input-symbol").value.trim();
-      const stream   = document.querySelector('input[name="stream"]:checked').value;
-
-      // Init exam
-      Exam.init(username, stream);
-
-      // Update UI
-      document.getElementById("hdr-username").textContent  = username;
-      document.getElementById("hdr-stream-tag").textContent = stream === "pcm" ? "Engineering · PCM" : "BioTech/Sci · PCB";
-      document.getElementById("sidebar-name").textContent  = username;
-      document.getElementById("sidebar-avatar").textContent = username[0]?.toUpperCase() || "C";
-      document.getElementById("exam-statusbar").classList.remove("hidden");
-      document.getElementById("timer-box").style.display   = "flex";
-
-      // Switch screens
-      document.getElementById("phase-login").classList.add("hidden");
-      document.getElementById("phase-exam").classList.remove("hidden");
-
+function renderTabs() {
+  const c = document.getElementById("subject-tabs");
+  c.innerHTML = "";
+  for (const [key, obj] of Object.entries(Exam.subjects)) {
+    const isActive = key === Exam.activeSubject;
+    const isDone = obj.currentIdx >= 40;
+    const btn = document.createElement("button");
+    btn.textContent = obj.name;
+    btn.className = [
+      "px-5 py-4 text-[11px] font-bold uppercase tracking-[0.15em] border-b-2 transition-colors",
+      isActive ? "border-red-700 text-slate-900" : "border-transparent text-slate-400 hover:text-slate-700",
+      isDone ? "opacity-60" : ""
+    ].join(" ");
+    btn.addEventListener("click", () => {
+      Exam.activeSubject = key;
+      chosenOption = null;
       renderAll();
     });
+    c.appendChild(btn);
+  }
+}
 
-    // Submit & Next
-    document.getElementById("btn-submit-next").addEventListener("click", () => {
-      if (chosenOption === null) return;
-      Exam.submit(chosenOption);
-      chosenOption = null;
+const DIFF_STYLES = {
+  1: { cls:"text-emerald-700 border-emerald-300 bg-emerald-50", label:"Tier 1 · Foundational" },
+  2: { cls:"text-teal-700 border-teal-300 bg-teal-50", label:"Tier 2 · Elementary" },
+  3: { cls:"text-blue-700 border-blue-300 bg-blue-50", label:"Tier 3 · Intermediate" },
+  4: { cls:"text-purple-700 border-purple-300 bg-purple-50", label:"Tier 4 · Advanced" },
+  5: { cls:"text-red-700 border-red-300 bg-red-50", label:"Tier 5 · Expert" }
+};
 
-      if (Exam.totalAnswered() >= 120) {
-        Exam.finalise();
-      } else {
-        renderAll();
-      }
-    });
+function renderQuestion() {
+  const s = Exam.activeSubjectObj;
+  document.getElementById("q-subject-label").textContent = s.name.toUpperCase();
+  document.getElementById("q-index-label").textContent = `Question ${s.currentIdx + 1} of 40`;
+  const pill = document.getElementById("difficulty-pill");
+  const btn = document.getElementById("btn-submit-next");
 
-    // End exam
-    document.getElementById("btn-end-exam").addEventListener("click", () => {
-      if (confirm("Are you sure you want to end and submit the examination now? This action cannot be undone.")) {
-        Exam.finalise();
-      }
-    });
+  if (s.currentIdx >= 40) {
+    document.getElementById("question-text").innerHTML = `
+      <div class="flex flex-col items-center justify-center py-20 text-center gap-4">
+        <div class="w-14 h-14 bg-emerald-100 flex items-center justify-center rounded-full">
+          <svg class="w-7 h-7 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div>
+          <div class="text-base font-bold text-slate-900">${s.name} Section Complete</div>
+          <div class="text-sm text-slate-500 mt-1 max-w-xs">All 40 questions answered. Switch to another subject above.</div>
+        </div>
+      </div>`;
+    document.getElementById("options-container").innerHTML = "";
+    pill.className = "hidden";
+    btn.classList.add("hidden");
+    return;
+  }
 
+  btn.classList.remove("hidden");
+  btn.disabled = true;
+
+  const q = s.questions[s.currentIdx];
+  const ds = DIFF_STYLES[q.level];
+
+  pill.className = `flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold tracking-wide uppercase border ${ds.cls}`;
+  pill.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-current"></span>${ds.label}`;
+
+  document.getElementById("question-text").innerHTML = q.text;
+
+  const oc = document.getElementById("options-container");
+  oc.innerHTML = "";
+  const labels = ["A","B","C","D"];
+
+  q.choices.forEach((choice, idx) => {
+    const btn2 = document.createElement("button");
+    btn2.className = "opt-btn w-full text-left flex items-center gap-4 px-5 py-4 border-2 border-slate-200 bg-white";
+    btn2.dataset.idx = idx;
+    btn2.innerHTML = `
+      <div class="opt-letter shrink-0 w-9 h-9 border-2 border-slate-300 text-slate-600 flex items-center justify-center text-sm font-black transition-all">
+        ${labels[idx]}
+      </div>
+      <span class="text-sm leading-relaxed text-slate-800">${choice}</span>
+    `;
+    btn2.addEventListener("click", () => selectOpt(idx));
+    oc.appendChild(btn2);
   });
-  </script>
+
+  typeset([document.getElementById("question-text"), oc]);
+}
+
+function selectOpt(idx) {
+  chosenOption = idx;
+  document.querySelectorAll(".opt-btn").forEach((b, i) => {
+    if (i === idx) b.classList.add("selected");
+    else b.classList.remove("selected");
+  });
+  document.getElementById("btn-submit-next").disabled = false;
+}
+
+function renderGrid() {
+  const s = Exam.activeSubjectObj;
+  document.getElementById("grid-subject-label").textContent = s.name;
+  const grid = document.getElementById("question-grid");
+  grid.innerHTML = "";
+  for (let i = 0; i < 40; i++) {
+    const cell = document.createElement("div");
+    cell.className = "q-cell " + (i < s.currentIdx ? "answered" : i === s.currentIdx ? "current" : "pending");
+    cell.textContent = i + 1;
+    grid.appendChild(cell);
+  }
+  const answered = Exam.totalAnswered();
+  document.getElementById("overall-count").textContent = `${answered} / 120`;
+  document.getElementById("overall-bar").style.width = `${(answered/120)*100}%`;
+}
+
+function renderAll() { renderTabs(); renderQuestion(); renderGrid(); }
+
+// ─────────────────────────────────────────────────────────────────────────
+// RESULTS
+// ─────────────────────────────────────────────────────────────────────────
+function buildResults() {
+  const total = Exam.totalScore();
+  const answered = Exam.totalAnswered();
+  const timeUsed = 7200 - Exam.secondsLeft;
+  const tm = String(Math.floor(timeUsed/60)).padStart(2,"0");
+  const ts = String(timeUsed%60).padStart(2,"0");
+
+  document.getElementById("res-total-score").textContent = total;
+  document.getElementById("res-time").textContent = `${tm}:${ts}`;
+  document.getElementById("res-username").textContent = Exam.username;
+  document.getElementById("res-date").textContent = new Date().toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+
+  const badge = document.getElementById("res-pass-badge");
+  if (total >= 528) {
+    badge.textContent = "Qualified";
+    badge.className = "inline-block px-4 py-1.5 text-[11px] font-black uppercase tracking-widest bg-emerald-100 text-emerald-800 border border-emerald-300";
+  } else {
+    badge.textContent = "Not Qualified";
+    badge.className = "inline-block px-4 py-1.5 text-[11px] font-black uppercase tracking-widest bg-red-100 text-red-800 border border-red-300";
+  }
+
+  let totalCorrect = 0, peakLevel = 1;
+  const tierStats = { 1:{seen:0,correct:0}, 2:{seen:0,correct:0}, 3:{seen:0,correct:0}, 4:{seen:0,correct:0}, 5:{seen:0,correct:0} };
+  const tbody = document.getElementById("res-subject-rows");
+  tbody.innerHTML = "";
+
+  for (const [key, sub] of Object.entries(Exam.subjects)) {
+    let correct = 0;
+    for (let i = 0; i < sub.currentIdx; i++) {
+      const q = sub.questions[i];
+      const ok = sub.responses[i] === q.correctIndex;
+      if (q.level > peakLevel) peakLevel = q.level;
+      tierStats[q.level].seen++;
+      if (ok) { correct++; totalCorrect++; tierStats[q.level].correct++; }
+    }
+    const acc = sub.currentIdx > 0 ? Math.round((correct/sub.currentIdx)*100) : 0;
+    const tr = document.createElement("tr");
+    tr.className = "hover:bg-slate-50 transition-colors";
+    tr.innerHTML = `
+      <td class="px-7 py-4 font-bold text-slate-900">${sub.name}</td>
+      <td class="px-7 py-4 text-center text-slate-600 font-mono">${sub.currentIdx}/40</td>
+      <td class="px-7 py-4 text-center font-black text-emerald-700">${correct}</td>
+      <td class="px-7 py-4 text-center font-semibold text-slate-700">${acc}%</td>
+      <td class="px-7 py-4 text-right display-number text-lg text-slate-900">${sub.score}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  const overallAcc = answered > 0 ? Math.round((totalCorrect/answered)*100) : 0;
+  document.getElementById("res-correct").textContent = `${totalCorrect}/${answered}`;
+  document.getElementById("res-accuracy").textContent = `Accuracy: ${overallAcc}%`;
+  document.getElementById("res-peak").textContent = `Level ${peakLevel}`;
+
+  const tc = document.getElementById("res-tier-distribution");
+  tc.innerHTML = "";
+  const tierColors = { 1:"bg-emerald-500", 2:"bg-teal-500", 3:"bg-blue-500", 4:"bg-purple-500", 5:"bg-red-500" };
+  const tierLabels = { 1:"Foundational", 2:"Elementary", 3:"Intermediate", 4:"Advanced", 5:"Expert" };
+  for (let l = 1; l <= 5; l++) {
+    const ts = tierStats[l];
+    const pct = ts.seen > 0 ? Math.round((ts.correct/ts.seen)*100) : 0;
+    const d = document.createElement("div");
+    d.className = "border border-slate-200 p-4 bg-slate-50";
+    d.innerHTML = `
+      <div class="text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">Tier ${l}</div>
+      <div class="text-[10px] text-slate-400 mb-3">${tierLabels[l]}</div>
+      <div class="h-1.5 w-full bg-slate-200 mb-2">
+        <div class="h-full ${tierColors[l]}" style="width:${pct}%"></div>
+      </div>
+      <div class="text-[11px] font-bold text-slate-700">${ts.correct} / ${ts.seen}</div>
+      <div class="text-[10px] text-slate-500">${pct}% accuracy</div>
+    `;
+    tc.appendChild(d);
+  }
+
+  const rc = document.getElementById("res-review");
+  rc.innerHTML = "";
+  const optLabels = ["A","B","C","D"];
+
+  for (const [key, sub] of Object.entries(Exam.subjects)) {
+    if (sub.currentIdx === 0) continue;
+    const hd = document.createElement("div");
+    hd.className = "pb-2 border-b border-slate-200";
+    hd.innerHTML = `<div class="text-[11px] font-black uppercase tracking-[0.2em] text-slate-900">${sub.name}</div>`;
+    rc.appendChild(hd);
+
+    for (let i = 0; i < sub.currentIdx; i++) {
+      const q = sub.questions[i];
+      const r = sub.responses[i];
+      const ok = r === q.correctIndex;
+      const item = document.createElement("div");
+      item.className = `border-l-4 p-5 ${ok ? "border-emerald-500 bg-emerald-50/40" : "border-red-500 bg-red-50/40"}`;
+      const optHtml = q.choices.map((ch, idx) => {
+        let cls = "text-slate-600";
+        if (idx === q.correctIndex) cls = "text-emerald-700 font-bold";
+        else if (idx === r && !ok) cls = "text-red-700 font-semibold line-through";
+        return `<div class="flex gap-2 text-[12px] ${cls}"><span class="font-black w-5 shrink-0">${optLabels[idx]}.</span><span>${ch}</span></div>`;
+      }).join("");
+
+      item.innerHTML = `
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-500">Q${i+1} · ${DIFF_STYLES[q.level].label}</span>
+          <span class="text-[10px] font-black uppercase tracking-wider ${ok ? 'text-emerald-700' : 'text-red-700'}">${ok ? '✓ Correct' : '✗ Incorrect'}</span>
+        </div>
+        <p class="text-sm font-medium text-slate-900 mb-3">${q.text}</p>
+        <div class="grid grid-cols-2 gap-1.5 bg-white p-3 border border-slate-100 mb-3">${optHtml}</div>
+        <div class="bg-white border-l-2 border-slate-900 p-3">
+          <div class="text-[10px] font-black uppercase tracking-wider text-slate-500 mb-1">Solution</div>
+          <div class="text-[12px] text-slate-700">${q.explanation}</div>
+        </div>
+      `;
+      rc.appendChild(item);
+    }
+  }
+  typeset([rc]);
+}
+
+function typeset(nodes) {
+  if (window.MathJax?.typesetPromise) window.MathJax.typesetPromise(nodes);
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// BOOTSTRAP
+// ─────────────────────────────────────────────────────────────────────────
+document.addEventListener("DOMContentLoaded", () => {
+
+  // Stream cards
+  document.querySelectorAll(".stream-card").forEach(card => {
+    card.addEventListener("click", () => {
+      document.querySelectorAll(".stream-card").forEach(c => c.dataset.selected = "false");
+      card.dataset.selected = "true";
+    });
+  });
+
+  // Login
+  document.getElementById("login-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const username = document.getElementById("input-symbol").value.trim();
+    const stream = document.querySelector('.stream-card[data-selected="true"]').dataset.stream;
+    Exam.init(username, stream);
+    document.getElementById("hdr-username").textContent = username;
+    document.getElementById("sidebar-name").textContent = username;
+    document.getElementById("sidebar-avatar").textContent = username[0]?.toUpperCase() || "C";
+    document.getElementById("sidebar-stream").textContent = stream === "pcm" ? "Engineering · PCM" : "Bio-Science · PCB";
+    document.getElementById("hdr-exam-status").classList.remove("hidden");
+    document.getElementById("hdr-exam-status").classList.add("flex");
+    document.getElementById("timer-box").style.display = "flex";
+    document.getElementById("phase-login").classList.add("hidden");
+    document.getElementById("phase-exam").classList.remove("hidden");
+    renderAll();
+  });
+
+  // Submit & Next
+  document.getElementById("btn-submit-next").addEventListener("click", () => {
+    if (chosenOption === null) return;
+    Exam.submit(chosenOption);
+    chosenOption = null;
+    if (Exam.totalAnswered() >= 120) Exam.finalise();
+    else renderAll();
+  });
+
+  // End exam
+  document.getElementById("btn-end-exam").addEventListener("click", () => {
+    if (confirm("End examination now? This action cannot be undone.")) Exam.finalise();
+  });
+});
+</script>
 </body>
 </html>
